@@ -13,13 +13,17 @@
     .card:hover { transform: scale(1.05); box-shadow: 0 0 25px #a855f7; }
   </style>
 </head>
-<body class="text-white min-h-screen pb-20">
+<body class="text-white min-h-screen pb-20 bg-[#1a0033]">
   <div class="max-w-2xl mx-auto p-4">
+    <!-- 你现在看到的漂亮头部 -->
     <div class="flex items-center justify-between mb-6">
-      <h1 class="text-3xl font-bold flex items-center gap-3">DND 剧本杀 <span class="text-xs bg-[#a855f7] px-3 py-1 rounded-full">角色广场</span></h1>
-      <button onclick="showCreateModal()" class="bg-[#a855f7] px-8 py-3 rounded-2xl font-bold">+ 新建角色卡</button>
+      <h1 class="text-4xl font-bold flex items-center gap-3">DND 剧本杀 <span class="text-xs bg-[#a855f7] px-4 py-1 rounded-full">角色广场</span></h1>
+      <button onclick="showCreateModal()" class="bg-[#a855f7] hover:bg-[#9333ea] px-8 py-3 rounded-2xl font-bold text-lg shadow-lg">+ 新建角色卡</button>
     </div>
-    <input id="searchInput" onkeyup="loadRoles()" placeholder="搜索角色..." class="w-full bg-[#2a0044] border border-white/10 rounded-2xl px-5 py-4 mb-8">
+
+    <input id="searchInput" onkeyup="loadRoles()" placeholder="搜索角色..." 
+           class="w-full bg-[#2a0044] border border-white/10 rounded-2xl px-5 py-4 text-lg mb-8">
+
     <div id="rolesGrid" class="grid grid-cols-2 gap-4"></div>
   </div>
 
@@ -27,77 +31,64 @@
   <div id="createModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
     <div class="bg-[#2a0044] w-full max-w-lg mx-4 rounded-3xl p-6">
       <h2 class="text-2xl font-bold mb-6">新建角色卡</h2>
-      <input id="cardName" placeholder="角色名称" class="w-full bg-[#1a0033] rounded-2xl px-5 py-4 mb-4">
-      <textarea id="systemPrompt" rows="8" placeholder="角色详细设定" class="w-full bg-[#1a0033] rounded-2xl px-5 py-4"></textarea>
+      <input id="cardName" placeholder="角色名称（必填）" class="w-full bg-[#1a0033] rounded-2xl px-5 py-4 mb-4">
+      <textarea id="systemPrompt" rows="8" placeholder="角色详细设定（系统提示词）" class="w-full bg-[#1a0033] rounded-2xl px-5 py-4"></textarea>
       <div class="flex gap-3 mt-8">
-        <button onclick="hideCreateModal()" class="flex-1 py-4 rounded-2xl border">取消</button>
+        <button onclick="hideCreateModal()" class="flex-1 py-4 rounded-2xl border border-white/30">取消</button>
         <button onclick="createCard()" class="flex-1 py-4 bg-[#a855f7] rounded-2xl font-bold">提交创建</button>
       </div>
     </div>
   </div>
 
   <script>
-    alert("🚀 小程序已加载！开始调试...");
-
+    // ==================== Telegram 初始化 ====================
     const webApp = window.Telegram.WebApp;
     webApp.ready(); webApp.expand();
     const userId = webApp.initDataUnsafe.user?.id || 123;
-    alert("你的 Telegram ID: " + userId);
 
-    // ==================== 已替换为你真实配置 ====================
+    // ==================== 你的 Supabase 配置（已填好） ====================
     const SUPABASE_URL = "https://pttzjqrdsgjygglkhvot.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C";
     const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // ==================== 创建角色卡 ====================
     async function createCard() {
-      alert("🔄 开始创建角色卡...");
       const name = document.getElementById('cardName').value.trim();
       const promptText = document.getElementById('systemPrompt').value.trim();
       if (!name || !promptText) return alert("❌ 名称和设定不能为空！");
 
-      try {
-        alert("📤 正在提交到 Supabase...");
-        const { data, error } = await supabase.from('role_cards').insert({ owner_id: userId, name, system_prompt: promptText }).select();
-        
-        if (error) {
-          alert("❌ 创建失败！\n错误信息：" + error.message + "\n\n建议：1. 确认 RLS 已关闭 2. 确认用了 anon/public key");
-          console.error(error);
-        } else {
-          alert("✅ 创建成功！ID = " + data[0].id + "\n\n回到聊天输入 /usecard " + data[0].id);
-          hideCreateModal();
-          loadRoles();
-        }
-      } catch (e) {
-        alert("❌ 意外错误：" + e.message);
+      const { data, error } = await supabase.from('role_cards').insert({ owner_id: userId, name, system_prompt: promptText }).select();
+      
+      if (error) {
+        alert("❌ 创建失败！\n" + error.message);
+      } else {
+        alert("✅ 创建成功！ID = " + data[0].id);
+        hideCreateModal();
+        loadRoles();
       }
     }
 
+    // ==================== 加载角色卡 ====================
     async function loadRoles() {
-      try {
-        const { data, error } = await supabase.from('role_cards').select('*').eq('owner_id', userId);
-        if (error) throw error;
-        document.getElementById('rolesGrid').innerHTML = (data || []).map(c => `
-          <div onclick="useCard(${c.id}, '${c.name}')" class="card bg-[#2a0044] rounded-3xl p-4 cursor-pointer">
-            <div class="font-bold">${c.name}</div><div class="text-xs text-purple-400">ID: ${c.id}</div>
-          </div>
-        `).join('');
-      } catch (e) {
-        alert("❌ 加载失败：" + e.message);
-      }
+      const { data } = await supabase.from('role_cards').select('*').eq('owner_id', userId);
+      document.getElementById('rolesGrid').innerHTML = (data || []).map(c => `
+        <div onclick="useCard(${c.id}, '${c.name}')" class="card bg-[#2a0044] rounded-3xl p-4 cursor-pointer">
+          <div class="font-bold text-xl">${c.name}</div>
+          <div class="text-xs text-purple-400 mt-2">ID: ${c.id}</div>
+        </div>
+      `).join('');
     }
 
     function useCard(id, name) {
       navigator.clipboard.writeText(`/usecard ${id}`);
-      alert(`✅ 已复制 /usecard ${id}\n\n回到主聊天粘贴即可使用「${name}」`);
+      alert(`✅ 已复制 /usecard ${id}\n\n回到聊天粘贴即可！`);
     }
 
     function showCreateModal() { document.getElementById('createModal').classList.remove('hidden'); }
     function hideCreateModal() { document.getElementById('createModal').classList.add('hidden'); }
 
-    window.onload = () => {
-      alert("📋 正在加载你的角色卡...");
-      loadRoles();
-    };
+    // 初始化
+    window.onload = loadRoles;
   </script>
 </body>
 </html>
