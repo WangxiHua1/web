@@ -39,36 +39,43 @@
     </div>
   </div>
 
-  <script>
+<script>
     // Telegram 初始化
-    <script>
     const webApp = window.Telegram.WebApp;
     webApp.ready();
-    const tgUser = webApp.initDataUnsafe.user;
+    webApp.expand();
+    const tgUser = webApp.initDataUnsafe?.user;
     const userId = tgUser ? tgUser.id : 123;
 
-    // === 必须改成你自己的 Supabase 配置 ===
+    // Supabase 配置（你的 key 已正确）
     const SUPABASE_URL = "https://pttzjqrdsgjygglkhvot.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0dHpqcXJkc2dqeWdnbGtodm90Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MTE1MzIsImV4cCI6MjA4OTQ4NzUzMn0.9m7fEqMAsQcCYM0FEDta9gkg-EhSsL4EbhUoOGI8peg"; 
+    const SUPABASE_ANON_KEY = "sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C";
 
-    // 关键修复：CDN 正确初始化方式（避免变量冲突）
-    const { createClient } = supabase;
-    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // 最稳定初始化方式
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log("✅ Supabase 已初始化");
 
     async function loadRoles() {
-      const { data, error } = await db
+      console.log("🔄 正在加载角色卡...");
+      const { data, error } = await supabase
         .from('role_cards')
         .select('*')
         .eq('owner_id', userId);
-      if (error) console.error("加载失败:", error);
-      renderCards(data || []);
+
+      if (error) {
+        console.error("❌ 加载失败:", error.message);
+        alert("加载失败，请看控制台错误信息");
+      } else {
+        console.log("✅ 加载成功，共有", data?.length || 0, "个角色");
+        renderCards(data || []);
+      }
     }
 
     function renderCards(cards) {
       const grid = document.getElementById('rolesGrid');
       grid.innerHTML = cards.map(card => `
         <div onclick="useCard(${card.id}, '${card.name.replace(/'/g, "\\'")}')" 
-             class="card bg-[#2a0044] rounded-3xl overflow-hidden p-4 cursor-pointer">
+             class="card bg-[#2a0044] rounded-3xl overflow-hidden p-4 cursor-pointer hover:scale-105">
           <div class="font-bold text-xl">${card.name}</div>
           <span class="bg-red-500 text-xs px-3 py-1 rounded-full mt-2 inline-block">NSFW</span>
           <div class="text-white/70 text-sm mt-3 line-clamp-3">${(card.system_prompt || '').substring(0,80)}...</div>
@@ -77,24 +84,22 @@
       `).join('');
     }
 
-    function filterCards() {
-      loadRoles(); // 后面可以改成真正的搜索
-    }
-
     async function createCard() {
       const name = document.getElementById('cardName').value.trim();
       const promptText = document.getElementById('systemPrompt').value.trim();
-      if (!name || !promptText) return alert("请填写名称和设定！");
+      if (!name || !promptText) return alert("名称和设定不能为空！");
 
-      const { error } = await db.from('role_cards').insert({
+      const { error } = await supabase.from('role_cards').insert({
         owner_id: userId,
         name: name,
         system_prompt: promptText
       });
 
-      if (error) alert("保存失败: " + error.message);
-      else {
-        alert("创建成功！\n\n回到聊天输入 /usecard ID 即可使用");
+      if (error) {
+        console.error("❌ 创建失败:", error);
+        alert("创建失败: " + error.message);
+      } else {
+        alert("✅ 创建成功！\n\n回到聊天输入 /usecard ID 即可使用");
         hideCreateModal();
         loadRoles();
       }
@@ -110,13 +115,13 @@
     function useCard(id, name) {
       const text = `/usecard ${id}`;
       navigator.clipboard.writeText(text);
-      alert(`已复制命令：\n${text}\n\n请回到 Telegram 主聊天窗口粘贴发送\n即可加载角色卡「${name}」`);
+      alert(`已复制：${text}\n\n请回到 Telegram 主聊天粘贴`);
     }
 
     // 初始化
     window.onload = () => {
+      console.log("🚀 页面加载完成，开始拉取数据...");
       loadRoles();
     };
-  </script>
-</body>
-</html>
+</script>
+    
