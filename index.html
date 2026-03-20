@@ -15,33 +15,24 @@
 </head>
 <body class="text-white min-h-screen pb-20">
   <div class="max-w-2xl mx-auto p-4">
-    <!-- 标题栏 -->
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-3xl font-bold flex items-center gap-3">
         DND 剧本杀 <span class="text-xs bg-[#a855f7] px-3 py-1 rounded-full">角色广场</span>
       </h1>
-      <button onclick="showCreateModal()" 
-              class="bg-[#a855f7] hover:bg-[#9333ea] px-8 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg">
-        + 新建角色卡
-      </button>
+      <button onclick="showCreateModal()" class="bg-[#a855f7] px-8 py-3 rounded-2xl font-bold">+ 新建角色卡</button>
     </div>
-
-    <input id="searchInput" onkeyup="filterCards()" type="text" placeholder="搜索角色名或关键词..." 
-           class="w-full bg-[#2a0044] border border-white/10 rounded-2xl px-5 py-4 text-lg outline-none mb-8">
-
+    <input id="searchInput" onkeyup="loadRoles()" placeholder="搜索角色..." class="w-full bg-[#2a0044] border border-white/10 rounded-2xl px-5 py-4 mb-8">
     <div id="rolesGrid" class="grid grid-cols-2 gap-4"></div>
   </div>
 
-  <!-- 创建角色卡弹窗（漂亮表单） -->
+  <!-- 创建弹窗 -->
   <div id="createModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
     <div class="bg-[#2a0044] w-full max-w-lg mx-4 rounded-3xl p-6">
       <h2 class="text-2xl font-bold mb-6">新建角色卡</h2>
-      <div class="space-y-5">
-        <input id="cardName" type="text" placeholder="角色名称（必填）" class="w-full bg-[#1a0033] rounded-2xl px-5 py-4">
-        <textarea id="systemPrompt" rows="6" placeholder="角色详细设定（系统提示词）" class="w-full bg-[#1a0033] rounded-2xl px-5 py-4"></textarea>
-      </div>
+      <input id="cardName" placeholder="角色名称" class="w-full bg-[#1a0033] rounded-2xl px-5 py-4 mb-4">
+      <textarea id="systemPrompt" rows="8" placeholder="角色详细设定" class="w-full bg-[#1a0033] rounded-2xl px-5 py-4"></textarea>
       <div class="flex gap-3 mt-8">
-        <button onclick="hideCreateModal()" class="flex-1 py-4 rounded-2xl border border-white/30">取消</button>
+        <button onclick="hideCreateModal()" class="flex-1 py-4 rounded-2xl border">取消</button>
         <button onclick="createCard()" class="flex-1 py-4 bg-[#a855f7] rounded-2xl font-bold">提交创建</button>
       </div>
     </div>
@@ -49,74 +40,62 @@
 
   <script>
     const webApp = window.Telegram.WebApp;
-    webApp.ready();
-    const tgUser = webApp.initDataUnsafe.user;
-    const userId = tgUser ? tgUser.id : 123;
+    webApp.ready(); webApp.expand();
+    const userId = webApp.initDataUnsafe.user?.id || 123;
 
-    // === 改这里！填你的 Supabase 配置 ===
-    const SUPABASE_URL = "https://pttzjqrdsgjygglkhvot.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_secret_dViXuEtXbH6o_ARpLEMKfw_JXxpJS-7";   // ← anon public key
+    const SUPABASE_URL = "https://pttzjqrdsgjygglkhvot.supabase.co";          // ← 你的真实 URL
+    const SUPABASE_ANON_KEY = "sb_secret_dViXuEtXbH6o_ARpLEMKfw_JXxpJS-7";         // ← 你的真实 key
     const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    async function loadRoles() {
-      const { data } = await supabase.from('role_cards').select('*').eq('owner_id', userId);
-      renderCards(data || []);
+    async function createCard() {
+      alert("🔄 开始创建角色卡...");   // 第一步提示
+
+      const name = document.getElementById('cardName').value.trim();
+      const promptText = document.getElementById('systemPrompt').value.trim();
+      if (!name || !promptText) return alert("❌ 名称和设定不能为空！");
+
+      try {
+        alert("📤 正在提交到 Supabase...");
+        const { data, error } = await supabase.from('role_cards').insert({
+          owner_id: userId,
+          name: name,
+          system_prompt: promptText
+        });
+
+        if (error) {
+          alert("❌ 创建失败！\n错误信息：" + error.message);
+          console.error(error);
+        } else {
+          alert("✅ 创建成功！\nID: " + (data[0]?.id || '未知') + "\n\n回到聊天输入 /usecard [ID] 即可使用");
+          hideCreateModal();
+          loadRoles();
+        }
+      } catch (e) {
+        alert("❌ 意外错误：" + e.message);
+        console.error(e);
+      }
     }
 
-    function renderCards(cards) {
-      const grid = document.getElementById('rolesGrid');
-      grid.innerHTML = cards.map(card => `
-        <div onclick="useCard(${card.id}, '${card.name}')" 
-             class="card bg-[#2a0044] rounded-3xl overflow-hidden p-4 cursor-pointer">
-          <div class="font-bold text-xl">${card.name}</div>
-          <span class="bg-red-500 text-xs px-3 py-1 rounded-full mt-2 inline-block">NSFW</span>
-          <div class="text-white/70 text-sm mt-3 line-clamp-3">${card.system_prompt.substring(0,80)}...</div>
-          <div class="text-xs text-purple-400 mt-4">ID: ${card.id}</div>
+    // 其他函数不变（loadRoles、renderCards 等）
+    async function loadRoles() {
+      const { data } = await supabase.from('role_cards').select('*').eq('owner_id', userId);
+      document.getElementById('rolesGrid').innerHTML = (data || []).map(c => `
+        <div onclick="useCard(${c.id}, '${c.name}')" class="card bg-[#2a0044] rounded-3xl p-4 cursor-pointer">
+          <div class="font-bold text-xl">${c.name}</div>
+          <div class="text-xs text-purple-400 mt-2">ID: ${c.id}</div>
         </div>
       `).join('');
     }
 
-    function filterCards() {
-      const keyword = document.getElementById('searchInput').value.toLowerCase();
-      // 简单前端过滤（可改成 Supabase 查询）
-      loadRoles(); // 实际项目可优化为带搜索的查询
-    }
-
-    async function createCard() {
-      const name = document.getElementById('cardName').value.trim();
-      const promptText = document.getElementById('systemPrompt').value.trim();
-      if (!name || !promptText) return alert("请填写名称和设定！");
-
-      const { error } = await supabase.from('role_cards').insert({
-        owner_id: userId,
-        name: name,
-        system_prompt: promptText
-      });
-
-      if (error) alert("保存失败: " + error.message);
-      else {
-        alert("✅ 创建成功！\n\n回到聊天输入 /usecard ID 即可使用");
-        hideCreateModal();
-        loadRoles();
-      }
+    function useCard(id, name) {
+      navigator.clipboard.writeText(`/usecard ${id}`);
+      alert(`✅ 已复制 /usecard ${id}\n\n回到主聊天粘贴发送即可！`);
     }
 
     function showCreateModal() { document.getElementById('createModal').classList.remove('hidden'); }
     function hideCreateModal() { document.getElementById('createModal').classList.add('hidden'); }
 
-    function useCard(id, name) {
-      const text = `/usecard ${id}`;
-      navigator.clipboard.writeText(text);
-      alert(`已复制命令：\n${text}\n\n请回到 Telegram 主聊天窗口粘贴发送\n即可加载角色卡「${name}」`);
-    }
-
-    // 初始化
-    window.onload = () => {
-      if (!SUPABASE_URL.includes("supabase.co")) {
-        alert("请先把 SUPABASE_URL 和 SUPABASE_ANON_KEY 改成你自己的！");
-      }
-      loadRoles();
-    };
+    window.onload = () => loadRoles();
   </script>
 </body>
 </html>
