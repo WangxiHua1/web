@@ -27,8 +27,8 @@
   </div>
 
   <!-- 创建弹窗 -->
-  <div id="createModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
-    <div class="bg-[#2a0044] w-full max-w-lg mx-4 rounded-3xl p-6">
+  <div id="createModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50" onclick="if(event.target.id==='createModal') hideCreateModal()">
+    <div class="bg-[#2a0044] w-full max-w-lg mx-4 rounded-3xl p-6" onclick="event.stopImmediatePropagation()">
       <h2 class="text-2xl font-bold mb-6">新建角色卡</h2>
       <input id="cardName" placeholder="角色名称（必填）" class="w-full bg-[#1a0033] rounded-2xl px-5 py-4 mb-4">
       <textarea id="systemPrompt" rows="8" placeholder="角色详细设定（系统提示词）" class="w-full bg-[#1a0033] rounded-2xl px-5 py-4"></textarea>
@@ -40,88 +40,99 @@
   </div>
 
 <script>
-    // Telegram 初始化
-    const webApp = window.Telegram.WebApp;
-    webApp.ready();
-    webApp.expand();
-    const tgUser = webApp.initDataUnsafe?.user;
-    const userId = tgUser ? tgUser.id : 123;
+  // Telegram 初始化 + 主题适配
+  const tg = window.Telegram.WebApp;
+  tg.ready();
+  tg.expand();
+  tg.setHeaderColor("#1a0033");
+  tg.setBackgroundColor("#1a0033");
 
-    // Supabase 配置（你的 key 已正确）
-    const SUPABASE_URL = "https://pttzjqrdsgjygglkhvot.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C";
+  const tgUser = tg.initDataUnsafe?.user;
+  const userId = tgUser ? tgUser.id : 123456;   // 测试用，上线后自动是真实 TG 用户ID
 
-    // 最稳定初始化方式
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    console.log("✅ Supabase 已初始化");
+  // Supabase 初始化（关键修复！）
+  const SUPABASE_URL = "https://pttzjqrdsgjygglkhvot.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C";
 
-    async function loadRoles() {
-      console.log("🔄 正在加载角色卡...");
-      const { data, error } = await supabase
-        .from('role_cards')
-        .select('*')
-        .eq('owner_id', userId);
+  const { createClient } = window.supabase;           // ← 这里是核心修复
+  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  console.log("✅ Supabase 初始化成功");
 
-      if (error) {
-        console.error("❌ 加载失败:", error.message);
-        alert("加载失败，请看控制台错误信息");
-      } else {
-        console.log("✅ 加载成功，共有", data?.length || 0, "个角色");
-        renderCards(data || []);
-      }
+  async function loadRoles() {
+    console.log("正在加载角色卡...");
+    const { data, error } = await supabaseClient
+      .from('role_cards')
+      .select('*')
+      .eq('owner_id', userId)
+      .order('id', { ascending: false });
+
+    if (error) {
+      console.error("加载失败:", error);
+      alert("加载失败，请看控制台");
+    } else {
+      console.log(`加载成功，共 ${data.length} 个角色`);
+      renderCards(data || []);
     }
+  }
 
-    function renderCards(cards) {
-      const grid = document.getElementById('rolesGrid');
-      grid.innerHTML = cards.map(card => `
-        <div onclick="useCard(${card.id}, '${card.name.replace(/'/g, "\\'")}')" 
-             class="card bg-[#2a0044] rounded-3xl overflow-hidden p-4 cursor-pointer hover:scale-105">
-          <div class="font-bold text-xl">${card.name}</div>
-          <span class="bg-red-500 text-xs px-3 py-1 rounded-full mt-2 inline-block">NSFW</span>
-          <div class="text-white/70 text-sm mt-3 line-clamp-3">${(card.system_prompt || '').substring(0,80)}...</div>
-          <div class="text-xs text-purple-400 mt-4">ID: ${card.id}</div>
-        </div>
-      `).join('');
+  function renderCards(cards) {
+    const grid = document.getElementById('rolesGrid');
+    if (cards.length === 0) {
+      grid.innerHTML = `<div class="col-span-2 text-center py-12 text-white/50">还没有角色卡，点击上方按钮创建吧~</div>`;
+      return;
     }
+    grid.innerHTML = cards.map(card => `
+      <div onclick="useCard(${card.id}, '${card.name.replace(/'/g, "\\'")}')" 
+           class="card bg-[#2a0044] rounded-3xl overflow-hidden p-4 cursor-pointer">
+        <div class="font-bold text-xl">${card.name}</div>
+        <span class="bg-red-500 text-xs px-3 py-1 rounded-full mt-2 inline-block">NSFW</span>
+        <div class="text-white/70 text-sm mt-3 line-clamp-3">${(card.system_prompt || '').substring(0,80)}...</div>
+        <div class="text-xs text-purple-400 mt-4">ID: ${card.id}</div>
+      </div>
+    `).join('');
+  }
 
-    async function createCard() {
-      const name = document.getElementById('cardName').value.trim();
-      const promptText = document.getElementById('systemPrompt').value.trim();
-      if (!name || !promptText) return alert("名称和设定不能为空！");
+  async function createCard() {
+    const name = document.getElementById('cardName').value.trim();
+    const promptText = document.getElementById('systemPrompt').value.trim();
+    if (!name) return alert("角色名称不能为空！");
+    if (!promptText) return alert("角色设定不能为空！");
 
-      const { error } = await supabase.from('role_cards').insert({
-        owner_id: userId,
-        name: name,
-        system_prompt: promptText
-      });
+    const { error } = await supabaseClient.from('role_cards').insert({
+      owner_id: userId,
+      name: name,
+      system_prompt: promptText
+    });
 
-      if (error) {
-        console.error("❌ 创建失败:", error);
-        alert("创建失败: " + error.message);
-      } else {
-        alert("✅ 创建成功！\n\n回到聊天输入 /usecard ID 即可使用");
-        hideCreateModal();
-        loadRoles();
-      }
-    }
-
-    function showCreateModal() { 
-      document.getElementById('createModal').classList.remove('hidden'); 
-    }
-    function hideCreateModal() { 
-      document.getElementById('createModal').classList.add('hidden'); 
-    }
-
-    function useCard(id, name) {
-      const text = `/usecard ${id}`;
-      navigator.clipboard.writeText(text);
-      alert(`已复制：${text}\n\n请回到 Telegram 主聊天粘贴`);
-    }
-
-    // 初始化
-    window.onload = () => {
-      console.log("🚀 页面加载完成，开始拉取数据...");
+    if (error) {
+      alert("创建失败: " + error.message);
+    } else {
+      alert("✅ 创建成功！\n\n回到主聊天输入 /usecard ID 即可使用");
+      hideCreateModal();
+      document.getElementById('cardName').value = '';
+      document.getElementById('systemPrompt').value = '';
       loadRoles();
-    };
+    }
+  }
+
+  function showCreateModal() { 
+    document.getElementById('createModal').classList.remove('hidden'); 
+  }
+  function hideCreateModal() { 
+    document.getElementById('createModal').classList.add('hidden'); 
+  }
+  function useCard(id, name) {
+    const text = `/usecard ${id}`;
+    navigator.clipboard.writeText(text).then(() => {
+      alert(`已复制：${text}\n\n请回到 Telegram 主聊天粘贴`);
+    });
+  }
+
+  // 页面加载
+  window.onload = () => {
+    console.log("页面加载完成，开始拉取数据...");
+    loadRoles();
+  };
 </script>
-    
+</body>
+</html>
