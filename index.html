@@ -129,7 +129,12 @@
         </label>
       </div>
       <div class="space-y-5">
-        <div class="flex items-center gap-3"><div class="blue-label">性别:</div><select id="gender" onchange="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg"><option value="">选择</option><option value="女">女</option><option value="男">男</option><option value="其他">其他</option></select></div>
+        <div class="flex items-center gap-3"><div class="blue-label">性别:</div>
+          <select id="gender" onchange="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
+  <option value="女" selected>女</option>
+  <option value="男">男</option>
+</select>
+        </div>
         
         <!-- 年龄强制最低18 -->
         <div class="flex items-center gap-3">
@@ -138,7 +143,13 @@
         </div>
 
         <div class="flex items-center gap-3"><div class="blue-label">性格:</div><input id="personality" placeholder="性格" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg"></div>
-        <div class="flex items-center gap-3"><div class="blue-label">外貌:</div><textarea id="appearance" rows="2" placeholder="身高165cm, 长相甜美, 高中校服JK款（示例）" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea></div>
+        <div class="flex items-center gap-3"><div class="blue-label">外貌:</div><textarea id="appearance" rows="2" placeholder="身高165cm, 长相甜美, 高中校服JK款（示例）" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea>
+        <div class="flex items-center gap-3">
+  <div class="blue-label">背景故事:</div>
+  <textarea id="background" rows="3" placeholder="背景故事（可选，越详细越好）" 
+            oninput="updateTokenCount()" 
+            class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea>
+</div></div>
         <div id="kinksSection" class="flex items-center gap-3 hidden">
           <div class="blue-label">性癖:</div>
           <input id="kinks" placeholder="异味癖，对拒绝敏感（示例，可多个）" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
@@ -318,6 +329,7 @@
     document.getElementById('nsfwToggle').checked = false;
     document.getElementById('kinksSection').classList.add('hidden');
     updateTokenCount();
+    document.getElementById('gender').value = '女';
   }
 
   function hideModal() {
@@ -360,6 +372,7 @@
       age: age,
       personality: document.getElementById('personality').value,
       appearance: document.getElementById('appearance').value,
+      background: document.getElementById('background').value.trim(),
       kinks: document.getElementById('nsfwToggle').checked ? document.getElementById('kinks').value : null,
       nsfw: document.getElementById('nsfwToggle').checked
     };
@@ -388,6 +401,7 @@
     document.getElementById('gender').value = card.gender || '';
     document.getElementById('age').value = card.age || '';
     document.getElementById('personality').value = card.personality || '';
+    document.getElementById('background').value = card.background || '';
     document.getElementById('appearance').value = card.appearance || '';
     document.getElementById('kinks').value = card.kinks || '';
     document.getElementById('kinksSection').classList.toggle('hidden', !card.nsfw);
