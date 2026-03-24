@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DND 角色广场</title>
+  <title>DND AI 助手</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,30 +11,133 @@
     body { background: #1a0033; font-family: system-ui, -apple-system, sans-serif; }
     .card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     .card:hover { transform: scale(1.03); box-shadow: 0 0 25px #a855f7; }
-    .tag { transition: all 0.2s; }
+    .tab-active { color: #a855f7; border-top: 3px solid #a855f7; }
     .modal-content { max-height: 90vh; overflow-y: auto; }
+    .chat-bubble { max-width: 75%; padding: 12px 18px; border-radius: 20px; }
+    .avatar { width: 64px; height: 64px; border-radius: 9999px; object-fit: cover; border: 3px solid #a855f7; }
   </style>
 </head>
-<body class="text-white min-h-screen pb-20 bg-[#1a0033]">
-  <div class="max-w-2xl mx-auto p-4 sm:p-6">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-3xl sm:text-4xl font-bold flex items-center gap-3">
-        DND 剧本杀 
-        <span class="text-xs bg-[#a855f7] px-4 py-1 rounded-full">角色广场</span>
-      </h1>
-      <button onclick="showModal()" 
-              class="bg-[#a855f7] hover:bg-[#9333ea] px-6 sm:px-8 py-3 rounded-2xl font-bold text-lg shadow-lg active:scale-95 transition">
-        + 新建角色卡
-      </button>
+<body class="text-white min-h-screen bg-[#1a0033] pb-20">
+  <!-- 顶部标题 -->
+  <div class="max-w-2xl mx-auto p-4">
+    <h1 class="text-3xl font-bold text-center mb-4">DND AI 助手</h1>
+  </div>
+
+  <!-- Tab 内容区域 -->
+  <div class="max-w-2xl mx-auto px-4">
+
+    <!-- 聊天 Tab -->
+    <div id="tab-chat" class="tab-content">
+      <h2 class="text-2xl font-bold mb-4">选择人物卡开始聊天</h2>
+      <div id="chatCardsGrid" class="grid grid-cols-2 gap-4 mb-8"></div>
+      
+      <!-- 聊天窗口 -->
+      <div id="chatWindow" class="hidden bg-[#2a0044] rounded-3xl p-4 h-[420px] flex flex-col">
+        <div class="flex items-center gap-3 mb-4 border-b border-white/10 pb-3">
+          <div id="chatCardName" class="font-bold text-lg"></div>
+          <button onclick="closeChat()" class="ml-auto text-white/60 text-sm">关闭</button>
+        </div>
+        <div id="chatMessages" class="flex-1 overflow-y-auto space-y-4 py-2"></div>
+        <div class="flex gap-2 mt-auto">
+          <input id="chatInput" placeholder="输入消息..." 
+                 class="flex-1 bg-[#1a0033] rounded-2xl px-5 py-3 focus:outline-none">
+          <button onclick="sendChatMessage()" 
+                  class="bg-[#a855f7] px-8 rounded-2xl font-bold">发送</button>
+        </div>
+      </div>
     </div>
 
-    <!-- 搜索 + 标签过滤 -->
-    <input id="searchInput" onkeyup="if(event.key==='Enter') filterRoles()" placeholder="搜索角色名称..." 
-           class="w-full bg-[#2a0044] border border-white/10 rounded-2xl px-5 py-4 text-lg mb-4 focus:outline-none focus:border-[#a855f7]">
+    <!-- 人物卡 Tab -->
+    <div id="tab-cards" class="tab-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-bold">人物卡</h2>
+        <button onclick="showModal()" class="bg-[#a855f7] hover:bg-[#9333ea] px-6 py-3 rounded-2xl font-bold active:scale-95">+ 新建</button>
+      </div>
+      <input id="searchInput" onkeyup="if(event.key==='Enter') filterRoles()" placeholder="搜索角色或标签..." 
+             class="w-full bg-[#2a0044] border border-white/10 rounded-2xl px-5 py-4 text-lg mb-4 focus:outline-none focus:border-[#a855f7]">
+      <div id="tagFilters" class="flex flex-wrap gap-2 mb-6"></div>
+      <div id="rolesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+    </div>
 
-    <div id="tagFilters" class="flex flex-wrap gap-2 mb-6"></div>
+    <!-- 赚钻石 Tab -->
+    <div id="tab-diamonds" class="tab-content hidden text-center py-12">
+      <h2 class="text-3xl font-bold mb-6">赚钻石</h2>
+      <div class="bg-[#2a0044] rounded-3xl p-10">
+        <p class="text-7xl mb-6">💎</p>
+        <p class="text-xl mb-8">当前页面暂时为空</p>
+        <p class="text-white/70 mb-10">后面可以在这里放抽奖、签到、任务等赚钻石功能～</p>
+        <button onclick="fakeLottery()" 
+                class="bg-[#a855f7] hover:bg-[#9333ea] px-10 py-4 rounded-2xl font-bold text-xl active:scale-95 transition">
+          🎟️ 立即抽奖（演示）
+        </button>
+      </div>
+    </div>
 
-    <div id="rolesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+    <!-- 我的 Tab（新增头像 + 设置） -->
+    <div id="tab-profile" class="tab-content hidden">
+      <h2 class="text-3xl font-bold mb-6">我的</h2>
+      
+      <!-- 头像 + 用户信息 -->
+      <div class="bg-[#2a0044] rounded-3xl p-6 mb-8 flex items-center gap-4">
+        <img id="userAvatar" src="https://via.placeholder.com/64/ a855f7/ffffff?text=👤" alt="头像" class="avatar">
+        <div class="flex-1">
+          <div id="userName" class="font-bold text-2xl"></div>
+          <div class="text-white/60 text-sm">Telegram 用户</div>
+        </div>
+        <div class="text-right">
+          <div class="text-white/60 text-sm">钻石</div>
+          <div id="diamondCount" class="text-5xl font-bold text-[#a855f7]">128</div>
+        </div>
+      </div>
+
+      <!-- 我创建的人物卡 -->
+      <div class="mb-4 flex justify-between items-center">
+        <div class="text-white/60">我创建的人物卡（<span id="cardCount">0</span> 张）</div>
+      </div>
+      <div id="myCardsList" class="space-y-3 mb-10"></div>
+
+      <!-- 设置区域 -->
+      <div class="bg-[#2a0044] rounded-3xl p-6">
+        <div class="text-lg font-bold mb-4">设置</div>
+        <div onclick="clearAllData()" class="flex items-center justify-between py-4 border-b border-white/10 cursor-pointer hover:bg-white/5 px-2 rounded-2xl">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">🗑️</span>
+            <div>清除所有人物卡</div>
+          </div>
+          <span class="text-red-400 text-sm">危险操作</span>
+        </div>
+        <div onclick="showAbout()" class="flex items-center justify-between py-4 border-b border-white/10 cursor-pointer hover:bg-white/5 px-2 rounded-2xl">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">ℹ️</span>
+            <div>关于 DND AI 助手</div>
+          </div>
+        </div>
+        <div onclick="logout()" class="flex items-center justify-between py-4 cursor-pointer hover:bg-white/5 px-2 rounded-2xl">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">🚪</span>
+            <div>退出登录（重新打开 WebApp）</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部导航栏 -->
+  <div class="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto bg-[#2a0044] border-t border-white/10">
+    <div class="grid grid-cols-4 text-center py-2">
+      <button onclick="switchTab(0)" class="tab-btn flex flex-col items-center py-2 text-white/70 hover:text-[#a855f7]">
+        💬<span class="text-xs mt-1">聊天</span>
+      </button>
+      <button onclick="switchTab(1)" class="tab-btn flex flex-col items-center py-2 text-white/70 hover:text-[#a855f7]">
+        🃏<span class="text-xs mt-1">人物卡</span>
+      </button>
+      <button onclick="switchTab(2)" class="tab-btn flex flex-col items-center py-2 text-white/70 hover:text-[#a855f7]">
+        💎<span class="text-xs mt-1">赚钻石</span>
+      </button>
+      <button onclick="switchTab(3)" class="tab-btn flex flex-col items-center py-2 text-white/70 hover:text-[#a855f7]">
+        👤<span class="text-xs mt-1">我的</span>
+      </button>
+    </div>
   </div>
 
   <!-- 创建/编辑弹窗 -->
@@ -60,7 +163,7 @@
       <textarea id="background" rows="4" placeholder="背景故事（越详细越好）" 
                 class="w-full bg-[#1a0033] rounded-2xl px-5 py-4 mb-4 resize-none"></textarea>
       
-      <textarea id="systemPrompt" rows="5" placeholder="完整系统提示词（可选，可不填）" 
+      <textarea id="systemPrompt" rows="5" placeholder="完整系统提示词（可选）" 
                 class="w-full bg-[#1a0033] rounded-2xl px-5 py-4 resize-none"></textarea>
 
       <div class="flex gap-3 mt-8">
@@ -68,35 +171,103 @@
         <button onclick="saveCard()" id="saveBtn" class="flex-1 py-4 bg-[#a855f7] rounded-2xl font-bold active:scale-95">保存</button>
       </div>
       
-      <!-- 删除按钮（仅编辑模式显示） -->
       <button onclick="deleteCard()" id="deleteBtn" 
               class="hidden mt-4 w-full py-4 text-red-400 border border-red-400/50 rounded-2xl hover:bg-red-400/10">🗑 删除这张角色卡</button>
     </div>
   </div>
 
 <script>
+  // ====================== Telegram & Supabase 配置 ======================
   const tg = window.Telegram.WebApp;
-  tg.ready(); tg.expand(); tg.setHeaderColor("#1a0033"); tg.setBackgroundColor("#1a0033");
+  tg.ready();
+  tg.expand();
+  tg.setHeaderColor("#1a0033");
+  tg.setBackgroundColor("#1a0033");
 
-  const tgUser = tg.initDataUnsafe?.user;
-  const userId = tgUser ? tgUser.id : 123456;
+  const tgUser = tg.initDataUnsafe?.user || {};
+  const userId = tgUser.id || 123456;
+  const userName = tgUser.username || tgUser.first_name || "玩家";
+  const userPhoto = tgUser.photo_url || "https://via.placeholder.com/64/a855f7/ffffff?text=👤";
 
   const SUPABASE_URL = "https://pttzjqrdsgjygglkhvot.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C";
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  let allCards = [];
+  let currentChatCard = null;
   let currentEditId = null;
   let selectedFilterTags = [];
-  let allCards = [];
+  let currentTags = [];
 
+  // ====================== Tab 切换 ======================
+  function switchTab(n) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    const tabs = ['tab-chat', 'tab-cards', 'tab-diamonds', 'tab-profile'];
+    document.getElementById(tabs[n]).classList.remove('hidden');
+    
+    document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+      btn.classList.toggle('tab-active', i === n);
+    });
+
+    if (n === 0) loadChatCards();
+    if (n === 1) loadRoles();
+    if (n === 3) loadProfile();
+  }
+
+  // ====================== 聊天 Tab ======================
+  function loadChatCards() {
+    const grid = document.getElementById('chatCardsGrid');
+    if (!allCards.length) {
+      grid.innerHTML = `<div class="col-span-full text-center py-12 text-white/50">还没有人物卡，先去「人物卡」创建吧～</div>`;
+      return;
+    }
+    grid.innerHTML = allCards.map(card => `
+      <div onclick="startChat(${card.id})" class="card bg-[#2a0044] rounded-3xl p-5 cursor-pointer">
+        <div class="font-bold text-lg">${card.name}</div>
+        ${card.tags && card.tags.length ? `<div class="flex flex-wrap gap-1 mt-2">${card.tags.map(t => `<span class="text-xs bg-[#a855f7]/20 px-3 py-0.5 rounded-3xl">#${t}</span>`).join('')}</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  function startChat(id) {
+    currentChatCard = allCards.find(c => c.id === id);
+    if (!currentChatCard) return;
+    document.getElementById('chatCardName').textContent = currentChatCard.name;
+    document.getElementById('chatMessages').innerHTML = `<div class="text-center text-white/50 py-8">已加载角色设定：<br><span class="text-[#a855f7]">${currentChatCard.name}</span></div>`;
+    document.getElementById('chatWindow').classList.remove('hidden');
+  }
+
+  function closeChat() {
+    document.getElementById('chatWindow').classList.add('hidden');
+    currentChatCard = null;
+  }
+
+  function sendChatMessage() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if (!msg || !currentChatCard) return;
+    
+    const messagesDiv = document.getElementById('chatMessages');
+    messagesDiv.innerHTML += `<div class="flex justify-end"><div class="chat-bubble bg-[#a855f7] text-white">${msg}</div></div>`;
+    input.value = '';
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    
+    // 模拟 AI 回复（后续可替换为真实 xAI API 调用）
+    setTimeout(() => {
+      const reply = `（基于【${currentChatCard.name}】设定）收到！让我用这个角色继续陪你玩～ 你想接下来发生什么？😏`;
+      messagesDiv.innerHTML += `<div class="flex justify-start"><div class="chat-bubble bg-[#3a0055]">${reply}</div></div>`;
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }, 800);
+  }
+
+  // ====================== 人物卡 Tab ======================
   async function loadRoles() {
     const { data, error } = await supabaseClient
       .from('role_cards')
       .select('*')
       .eq('owner_id', userId)
       .order('id', { ascending: false });
-
-    if (error) return console.error(error);
+    if (error) console.error(error);
     allCards = data || [];
     renderFilterTags();
     filterRoles();
@@ -127,17 +298,10 @@
   function filterRoles() {
     const search = document.getElementById('searchInput').value.trim().toLowerCase();
     let filtered = allCards;
-
-    if (search) {
-      filtered = filtered.filter(c => c.name.toLowerCase().includes(search));
-    }
+    if (search) filtered = filtered.filter(c => c.name.toLowerCase().includes(search));
     if (selectedFilterTags.length > 0) {
-      filtered = filtered.filter(c => {
-        const cardTags = c.tags || [];
-        return selectedFilterTags.some(t => cardTags.includes(t));
-      });
+      filtered = filtered.filter(c => (c.tags || []).some(t => selectedFilterTags.includes(t)));
     }
-
     renderCards(filtered);
   }
 
@@ -149,10 +313,8 @@
     }
     grid.innerHTML = cards.map(card => `
       <div onclick="editCard(${card.id})" class="card bg-[#2a0044] rounded-3xl overflow-hidden p-5 cursor-pointer">
-        <div class="flex justify-between items-start">
-          <div class="font-bold text-xl mb-2">${card.name}</div>
-        </div>
-        ${card.tags && card.tags.length ? `<div class="flex flex-wrap gap-1 mb-3">${card.tags.map(t=>`<span class="text-xs bg-[#a855f7]/20 text-[#a855f7] px-3 py-0.5 rounded-3xl">#${t}</span>`).join('')}</div>` : ''}
+        <div class="font-bold text-xl mb-2">${card.name}</div>
+        ${card.tags && card.tags.length ? `<div class="flex flex-wrap gap-1 mb-3">${card.tags.map(t => `<span class="text-xs bg-[#a855f7]/20 text-[#a855f7] px-3 py-0.5 rounded-3xl">#${t}</span>`).join('')}</div>` : ''}
         ${card.personality ? `<div class="text-sm text-white/70 mb-1">性格：${card.personality.substring(0,40)}...</div>` : ''}
         ${card.background ? `<div class="text-xs text-white/50 line-clamp-2">${card.background.substring(0,80)}...</div>` : ''}
       </div>
@@ -164,30 +326,25 @@
     document.getElementById('modalTitle').textContent = isEdit ? '编辑角色卡' : '新建角色卡';
     document.getElementById('deleteBtn').classList.toggle('hidden', !isEdit);
     document.getElementById('saveBtn').textContent = isEdit ? '保存修改' : '创建角色卡';
-    
-    // 清空标签芯片
     document.getElementById('tagChips').innerHTML = '';
   }
 
   function hideModal() {
     document.getElementById('modal').classList.add('hidden');
     currentEditId = null;
-    // 清空表单
-    ['cardName','personality','background','systemPrompt','tagInput'].forEach(id => {
-      document.getElementById(id).value = '';
+    currentTags = [];
+    ['cardName', 'personality', 'background', 'systemPrompt', 'tagInput'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
     });
-    document.getElementById('tagChips').innerHTML = '';
   }
 
-  let currentTags = [];
   function addTag() {
     const input = document.getElementById('tagInput');
     const val = input.value.trim();
-    if (!val) return;
-    if (!currentTags.includes(val)) {
-      currentTags.push(val);
-      renderChips();
-    }
+    if (!val || currentTags.includes(val)) return;
+    currentTags.push(val);
+    renderChips();
     input.value = '';
   }
 
@@ -208,7 +365,6 @@
   async function saveCard() {
     const name = document.getElementById('cardName').value.trim();
     if (!name) return alert("角色名称不能为空！");
-
     const payload = {
       owner_id: userId,
       name: name,
@@ -217,14 +373,12 @@
       background: document.getElementById('background').value.trim(),
       system_prompt: document.getElementById('systemPrompt').value.trim() || null
     };
-
     let error;
     if (currentEditId) {
       ({ error } = await supabaseClient.from('role_cards').update(payload).eq('id', currentEditId));
     } else {
       ({ error } = await supabaseClient.from('role_cards').insert(payload));
     }
-
     if (error) {
       alert("保存失败: " + error.message);
     } else {
@@ -237,35 +391,80 @@
   function editCard(id) {
     const card = allCards.find(c => c.id === id);
     if (!card) return;
-
     currentEditId = id;
     currentTags = card.tags || [];
-
     document.getElementById('cardName').value = card.name || '';
     document.getElementById('personality').value = card.personality || '';
     document.getElementById('background').value = card.background || '';
     document.getElementById('systemPrompt').value = card.system_prompt || '';
-
     showModal(true);
     renderChips();
   }
 
   async function deleteCard() {
     if (!currentEditId) return;
-    if (!confirm("确定要删除这张角色卡吗？此操作不可恢复！")) return;
-
+    if (!confirm("确定删除这张角色卡吗？不可恢复！")) return;
     const { error } = await supabaseClient.from('role_cards').delete().eq('id', currentEditId);
-    if (error) {
-      alert("删除失败: " + error.message);
-    } else {
+    if (error) alert("删除失败: " + error.message);
+    else {
       alert("🗑 删除成功！");
       hideModal();
       loadRoles();
     }
   }
 
-  // 页面加载
-  window.onload = loadRoles;
+  // ====================== 赚钻石 Tab ======================
+  function fakeLottery() {
+    alert("🎉 恭喜！你抽中了 50 钻石！（演示）\n\n真实抽奖功能后面再加～");
+    // 后续可在此更新 Supabase 钻石表
+  }
+
+  // ====================== 我的 Tab ======================
+  function loadProfile() {
+    // 头像 & 用户名
+    document.getElementById('userAvatar').src = userPhoto;
+    document.getElementById('userName').textContent = userName;
+    document.getElementById('diamondCount').textContent = "128"; // 后续可从 Supabase 读取
+
+    // 人物卡数量 & 列表
+    document.getElementById('cardCount').textContent = allCards.length;
+    const list = document.getElementById('myCardsList');
+    list.innerHTML = allCards.length ? 
+      allCards.map(c => `
+        <div class="bg-[#2a0044] rounded-2xl p-4 flex justify-between items-center">
+          <div class="font-medium">${c.name}</div>
+          <div class="text-[#a855f7] text-sm">${c.tags ? c.tags.join(' ') : ''}</div>
+        </div>`).join('') : 
+      '<div class="text-white/50 text-center py-8">还没有卡片哦～快去创建吧！</div>';
+  }
+
+  // 设置功能
+  async function clearAllData() {
+    if (!confirm("⚠️ 确定要清除你**所有**人物卡吗？此操作不可恢复！")) return;
+    const { error } = await supabaseClient.from('role_cards').delete().eq('owner_id', userId);
+    if (error) alert("清除失败");
+    else {
+      alert("✅ 已清除所有人物卡");
+      loadRoles();
+      switchTab(3);
+    }
+  }
+
+  function showAbout() {
+    alert("DND AI 助手 v1.0\n\n由 xAI Grok + Supabase + Vercel + Railway 驱动\n\n欢迎随时反馈新功能～");
+  }
+
+  function logout() {
+    if (confirm("退出登录？重新打开 Telegram WebApp 即可重新登录。")) {
+      tg.close();
+    }
+  }
+
+  // ====================== 页面初始化 ======================
+  window.onload = () => {
+    loadRoles();      // 加载所有人物卡
+    switchTab(1);     // 默认打开「人物卡」
+  };
 </script>
 </body>
 </html>
