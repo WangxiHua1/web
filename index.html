@@ -64,8 +64,8 @@
       <div class="bg-[#2a0044] rounded-3xl p-10">
         <p class="text-7xl mb-6">💎</p>
         <p class="text-xl mb-8">当前页面暂时为空</p>
-        <p class="text-white/70 mb-10">占位符</p>
-        <button onclick="fakeLottery()" class="bg-[#a855f7] hover:bg-[#9333ea] px-10 py-4 rounded-2xl font-bold text-xl active:scale-95 transition">🎟️ 彩票？</button>
+        <p class="text-white/70 mb-10">后面可以在这里放抽奖、签到、任务等赚钻石功能～</p>
+        <button onclick="fakeLottery()" class="bg-[#a855f7] hover:bg-[#9333ea] px-10 py-4 rounded-2xl font-bold text-xl active:scale-95 transition">🎟️ 立即签到（演示）</button>
       </div>
     </div>
 
@@ -88,7 +88,7 @@
         <div class="flex justify-between items-center bg-[#1a0033] rounded-3xl p-6">
           <div>
             <div class="text-white/60 text-sm">钻石余额</div>
-            <div id="diamondCount" class="text-6xl font-bold text-[#a855f7]">000</div>
+            <div id="diamondCount" class="text-6xl font-bold text-[#a855f7]">128</div>
           </div>
           <div class="text-7xl">💎</div>
         </div>
@@ -110,7 +110,7 @@
     </div>
   </div>
 
-  <!-- 人物卡弹窗 -->
+  <!-- 人物卡弹窗（已强制年龄≥18 + 动态性癖） -->
   <div id="modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4" onclick="if(event.target.id==='modal') hideModal()">
     <div class="modal-content bg-[#1f2937] w-full max-w-lg mx-auto rounded-3xl p-6" onclick="event.stopImmediatePropagation()">
       <div class="flex justify-between items-center mb-6">
@@ -130,11 +130,13 @@
       </div>
       <div class="space-y-5">
         <div class="flex items-center gap-3"><div class="blue-label">性别:</div><select id="gender" onchange="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg"><option value="">选择</option><option value="女">女</option><option value="男">男</option><option value="其他">其他</option></select></div>
-        <!-- 年龄字段：强制最低 18 岁 -->
+        
+        <!-- 年龄强制最低18 -->
         <div class="flex items-center gap-3">
           <div class="blue-label">年龄:</div>
           <input id="age" type="number" min="18" placeholder="18" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
         </div>
+
         <div class="flex items-center gap-3"><div class="blue-label">性格:</div><input id="personality" placeholder="性格" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg"></div>
         <div class="flex items-center gap-3"><div class="blue-label">外貌:</div><textarea id="appearance" rows="2" placeholder="身高165cm, 长相甜美, 高中校服JK款（示例）" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea></div>
         <div id="kinksSection" class="flex items-center gap-3 hidden">
@@ -150,7 +152,7 @@
         <div id="tagChips" class="flex flex-wrap gap-2"></div>
       </div>
       <div id="tokenDisplay" class="text-xs text-white/60 flex justify-end mt-4">
-        总消耗: <span id="tokenCount" class="font-mono text-[#a855f7] ml-1">000</span> tokens
+        总消耗: <span id="tokenCount" class="font-mono text-[#a855f7] ml-1">0</span> / 6000 tokens
       </div>
       <div class="flex gap-3 mt-8">
         <button onclick="hideModal()" class="flex-1 py-4 rounded-2xl border border-white/30 text-white/80">取消</button>
@@ -161,8 +163,8 @@
   </div>
 
 <script>
-  const tg = window.Telegram.WebApp;
-  tg.ready(); tg.expand(); tg.setHeaderColor("#1a0033"); tg.setBackgroundColor("#1a0033");
+  // ====================== 完整脚本（已包含年龄≥18校验） ======================
+  const tg = window.Telegram.WebApp; tg.ready(); tg.expand(); tg.setHeaderColor("#1a0033"); tg.setBackgroundColor("#1a0033");
   const userId = tg.initDataUnsafe?.user?.id || 123456;
   const SUPABASE_URL = "https://pttzjqrdsgjygglkhvot.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C";
@@ -187,9 +189,7 @@
     total += estimateTokens(document.getElementById('userRoleName').value);
     total += estimateTokens(document.getElementById('personality').value);
     total += estimateTokens(document.getElementById('appearance').value);
-    if (!document.getElementById('kinksSection').classList.contains('hidden')) {
-      total += estimateTokens(document.getElementById('kinks').value);
-    }
+    if (!document.getElementById('kinksSection').classList.contains('hidden')) total += estimateTokens(document.getElementById('kinks').value);
     total += currentTags.length * 8;
     total += 120;
     document.getElementById('tokenCount').textContent = total;
@@ -205,10 +205,10 @@
     document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
     const tabs = ['tab-chat','tab-cards','tab-diamonds','tab-profile'];
     document.getElementById(tabs[n]).classList.remove('hidden');
-    document.querySelectorAll('.tab-btn').forEach((btn,i) => btn.classList.toggle('tab-active', i===n));
-    if (n === 0) loadChatCards();
-    if (n === 1) loadRoles();
-    if (n === 3) loadProfile();
+    document.querySelectorAll('.tab-btn').forEach((btn,i)=>btn.classList.toggle('tab-active',i===n));
+    if(n===0) loadChatCards();
+    if(n===1) loadRoles();
+    if(n===3) loadProfile();
   }
 
   async function loadRoles() {
@@ -244,11 +244,7 @@
     const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
     let filtered = allCards;
     if (searchTerm) {
-      filtered = filtered.filter(card => {
-        const nameMatch = card.name.toLowerCase().includes(searchTerm);
-        const tagMatch = (card.tags || []).some(tag => tag.toLowerCase().includes(searchTerm));
-        return nameMatch || tagMatch;
-      });
+      filtered = filtered.filter(card => card.name.toLowerCase().includes(searchTerm) || (card.tags || []).some(tag => tag.toLowerCase().includes(searchTerm)));
     }
     if (selectedFilterTags.length > 0) {
       filtered = filtered.filter(card => (card.tags || []).some(t => selectedFilterTags.includes(t)));
@@ -295,10 +291,7 @@
     document.getElementById('chatWindow').classList.remove('hidden');
   }
 
-  function closeChat() {
-    document.getElementById('chatWindow').classList.add('hidden');
-    currentChatCard = null;
-  }
+  function closeChat() { document.getElementById('chatWindow').classList.add('hidden'); currentChatCard = null; }
 
   function sendChatMessage() {
     const input = document.getElementById('chatInput');
@@ -357,12 +350,14 @@
   async function saveCard() {
     const name = document.getElementById('cardName').value.trim();
     if (!name) return alert("AI角色名不能为空！");
+    const age = parseInt(document.getElementById('age').value);
+    if (age < 18) return alert("年龄必须 ≥ 18 岁！");
     const payload = {
       owner_id: userId,
       name: name,
       tags: currentTags,
       gender: document.getElementById('gender').value,
-      age: document.getElementById('age').value,
+      age: age,
       personality: document.getElementById('personality').value,
       appearance: document.getElementById('appearance').value,
       kinks: document.getElementById('nsfwToggle').checked ? document.getElementById('kinks').value : null,
@@ -413,26 +408,17 @@
     }
   }
 
-  function fakeLottery() {
-    alert("🎉 占位符");
-  }
+  function fakeLottery() { alert("🎉获得了 50 钻石！（演示）"); }
 
   async function loadProfile() {
-    const { data: profile } = await supabaseClient
-      .from('user_profiles')
-      .select('custom_name, diamonds, custom_avatar_url')
-      .eq('user_id', userId)
-      .single();
-
+    const { data: profile } = await supabaseClient.from('user_profiles').select('custom_name, diamonds, custom_avatar_url').eq('user_id', userId).single();
     const name = profile?.custom_name || "玩家";
-    const diamonds = profile?.diamonds || 000;
+    const diamonds = profile?.diamonds || 128;
     const avatarUrl = profile?.custom_avatar_url || "https://via.placeholder.com/80/a855f7/ffffff?text=👤";
-
     document.getElementById('userName').textContent = name;
     document.getElementById('customNameInput').value = name;
     document.getElementById('diamondCount').textContent = diamonds;
     document.getElementById('userAvatar').src = avatarUrl;
-
     document.getElementById('cardCount').textContent = allCards.length;
     const list = document.getElementById('myCardsList');
     list.innerHTML = allCards.length ? allCards.map(c => `
@@ -444,15 +430,9 @@
 
   async function saveProfile() {
     const newName = document.getElementById('customNameInput').value.trim() || "玩家";
-    const { error } = await supabaseClient
-      .from('user_profiles')
-      .update({ custom_name: newName })
-      .eq('user_id', userId);
+    const { error } = await supabaseClient.from('user_profiles').update({ custom_name: newName }).eq('user_id', userId);
     if (error) alert("保存失败");
-    else {
-      alert("✅ 名字已保存");
-      loadProfile();
-    }
+    else { alert("✅ 名字已保存"); loadProfile(); }
   }
 
   async function uploadAvatar(e) {
