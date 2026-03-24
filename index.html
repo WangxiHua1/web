@@ -15,9 +15,11 @@
     .modal-content { max-height: 90vh; overflow-y: auto; }
     .chat-bubble { max-width: 75%; padding: 12px 18px; border-radius: 20px; }
     .avatar { width: 64px; height: 64px; border-radius: 9999px; object-fit: cover; border: 3px solid #a855f7; }
+    .blue-label { background: #3b82f6; color: white; padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; }
   </style>
 </head>
 <body class="text-white min-h-screen bg-[#1a0033] pb-20">
+
   <!-- 顶部标题 -->
   <div class="max-w-2xl mx-auto p-4">
     <h1 class="text-3xl font-bold text-center mb-4">DND AI 助手</h1>
@@ -73,13 +75,13 @@
       </div>
     </div>
 
-    <!-- 我的 Tab（新增头像 + 设置） -->
+    <!-- 我的 Tab -->
     <div id="tab-profile" class="tab-content hidden">
       <h2 class="text-3xl font-bold mb-6">我的</h2>
       
       <!-- 头像 + 用户信息 -->
       <div class="bg-[#2a0044] rounded-3xl p-6 mb-8 flex items-center gap-4">
-        <img id="userAvatar" src="https://via.placeholder.com/64/ a855f7/ffffff?text=👤" alt="头像" class="avatar">
+        <img id="userAvatar" src="https://via.placeholder.com/64/a855f7/ffffff?text=👤" alt="头像" class="avatar">
         <div class="flex-1">
           <div id="userName" class="font-bold text-2xl"></div>
           <div class="text-white/60 text-sm">Telegram 用户</div>
@@ -140,37 +142,114 @@
     </div>
   </div>
 
-  <!-- 创建/编辑弹窗 -->
+  <!-- 🔥 全新专业人物卡弹窗（完全按你3张图片样式重做） -->
   <div id="modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4" onclick="if(event.target.id==='modal') hideModal()">
-    <div class="modal-content bg-[#2a0044] w-full max-w-lg mx-auto rounded-3xl p-6" onclick="event.stopImmediatePropagation()">
-      <h2 id="modalTitle" class="text-2xl font-bold mb-6">新建角色卡</h2>
+    <div class="modal-content bg-[#1f2937] w-full max-w-lg mx-auto rounded-3xl p-6" onclick="event.stopImmediatePropagation()">
       
-      <input id="cardName" placeholder="角色名称（必填）" class="w-full bg-[#1a0033] rounded-2xl px-5 py-4 mb-4 text-lg">
-      
-      <!-- 标签 -->
-      <div class="mb-4">
-        <div class="flex gap-2">
-          <input id="tagInput" placeholder="输入标签后回车或点击添加" 
-                 class="flex-1 bg-[#1a0033] rounded-2xl px-5 py-4 text-lg" onkeydown="if(event.key==='Enter') addTag()">
-          <button onclick="addTag()" class="bg-[#a855f7] px-6 rounded-2xl font-bold">添加</button>
-        </div>
-        <div id="tagChips" class="flex flex-wrap gap-2 mt-3"></div>
+      <div class="flex justify-between items-center mb-6">
+        <h2 id="modalTitle" class="text-2xl font-bold">AI角色名（必填）</h2>
+        <button onclick="hideModal()" class="text-white/60 text-3xl leading-none">×</button>
       </div>
 
-      <textarea id="personality" rows="3" placeholder="人物性格（例如：外向、腹黑、温柔...）" 
-                class="w-full bg-[#1a0033] rounded-2xl px-5 py-4 mb-4 resize-none"></textarea>
-      
-      <textarea id="background" rows="4" placeholder="背景故事（越详细越好）" 
-                class="w-full bg-[#1a0033] rounded-2xl px-5 py-4 mb-4 resize-none"></textarea>
-      
-      <textarea id="systemPrompt" rows="5" placeholder="完整系统提示词（可选）" 
-                class="w-full bg-[#1a0033] rounded-2xl px-5 py-4 resize-none"></textarea>
+      <!-- AI角色名 -->
+      <input id="cardName" placeholder="AI扮演的角色名字" 
+             class="w-full bg-[#374151] rounded-2xl px-5 py-4 text-lg mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+      <!-- 用户角色名（非必填） -->
+      <div class="mb-6">
+        <div class="text-white/70 text-sm mb-2">用户角色名（非必填）</div>
+        <input id="userRoleName" placeholder="不会在聊天中显示，但可帮AI更好生成对话内容" 
+               class="w-full bg-[#374151] rounded-2xl px-5 py-4 text-lg">
+      </div>
+
+      <!-- NSFW -->
+      <div class="flex items-center gap-3 mb-6">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="nsfwToggle" class="w-5 h-5 accent-blue-500">
+          <span class="text-lg font-medium">NSFW</span>
+        </label>
+      </div>
+
+      <!-- 结构化字段（蓝标签风格） -->
+      <div class="space-y-5">
+        <div class="flex items-center gap-3">
+          <div class="blue-label">性别:</div>
+          <select id="gender" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
+            <option value="">选择</option>
+            <option value="女">女</option>
+            <option value="男">男</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="blue-label">年龄:</div>
+          <input id="age" placeholder="18（示例，最小18岁）" 
+                 class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="blue-label">性格:</div>
+          <input id="personality" placeholder="性格" 
+                 class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="blue-label">外貌:</div>
+          <textarea id="appearance" rows="2" placeholder="身高165cm, 长相甜美, 高中校服JK款（示例）外貌（身形，长相，穿着）" 
+                    class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="blue-label">性癖:</div>
+          <input id="kinks" placeholder="异味癖，对拒绝敏感（示例，可多个）" 
+                 class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
+        </div>
+      </div>
+
+      <!-- 标签 -->
+      <div class="mt-6 mb-6">
+        <div class="flex gap-2 mb-2">
+          <input id="tagInput" placeholder="输入标签后回车或点击添加" 
+                 class="flex-1 bg-[#374151] rounded-2xl px-5 py-4" onkeydown="if(event.key==='Enter') addTag()">
+          <button onclick="addTag()" class="bg-blue-500 px-6 rounded-2xl font-bold">添加</button>
+        </div>
+        <div id="tagChips" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <!-- 开启新手模式 -->
+      <div class="flex items-center gap-2 mb-6">
+        <input type="checkbox" id="beginnerMode" class="w-5 h-5 accent-blue-500">
+        <span class="text-white/80">开启新手模式</span>
+      </div>
+
+      <!-- 对话示例 -->
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-3">
+          <div class="text-white/70">对话示例</div>
+          <button onclick="addExampleDialog()" class="text-blue-400 text-sm">+ 添加示例</button>
+        </div>
+        <div id="exampleDialogs" class="space-y-3 bg-[#374151] rounded-3xl p-4"></div>
+      </div>
+
+      <!-- 切换高级模式 -->
+      <div class="mb-6">
+        <div onclick="toggleAdvanced()" class="flex items-center justify-between cursor-pointer py-2">
+          <span class="text-white/70">切换高级模式</span>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="advancedToggle" class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:bg-blue-500"></div>
+          </label>
+        </div>
+        <textarea id="systemPrompt" rows="4" placeholder="完整系统提示词（可选）" 
+                  class="hidden w-full mt-3 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea>
+      </div>
 
       <div class="flex gap-3 mt-8">
-        <button onclick="hideModal()" class="flex-1 py-4 rounded-2xl border border-white/30 text-white/80 active:bg-white/10">取消</button>
-        <button onclick="saveCard()" id="saveBtn" class="flex-1 py-4 bg-[#a855f7] rounded-2xl font-bold active:scale-95">保存</button>
+        <button onclick="hideModal()" class="flex-1 py-4 rounded-2xl border border-white/30 text-white/80">取消</button>
+        <button onclick="saveCard()" id="saveBtn" class="flex-1 py-4 bg-[#3b82f6] rounded-2xl font-bold">提交</button>
       </div>
-      
+
       <button onclick="deleteCard()" id="deleteBtn" 
               class="hidden mt-4 w-full py-4 text-red-400 border border-red-400/50 rounded-2xl hover:bg-red-400/10">🗑 删除这张角色卡</button>
     </div>
@@ -198,6 +277,7 @@
   let currentEditId = null;
   let selectedFilterTags = [];
   let currentTags = [];
+  let currentExampleDialogs = [];
 
   // ====================== Tab 切换 ======================
   function switchTab(n) {
@@ -224,6 +304,7 @@
     grid.innerHTML = allCards.map(card => `
       <div onclick="startChat(${card.id})" class="card bg-[#2a0044] rounded-3xl p-5 cursor-pointer">
         <div class="font-bold text-lg">${card.name}</div>
+        ${card.gender ? `<div class="text-xs text-blue-400 mt-1">性别：${card.gender}</div>` : ''}
         ${card.tags && card.tags.length ? `<div class="flex flex-wrap gap-1 mt-2">${card.tags.map(t => `<span class="text-xs bg-[#a855f7]/20 px-3 py-0.5 rounded-3xl">#${t}</span>`).join('')}</div>` : ''}
       </div>
     `).join('');
@@ -314,29 +395,30 @@
     grid.innerHTML = cards.map(card => `
       <div onclick="editCard(${card.id})" class="card bg-[#2a0044] rounded-3xl overflow-hidden p-5 cursor-pointer">
         <div class="font-bold text-xl mb-2">${card.name}</div>
-        ${card.tags && card.tags.length ? `<div class="flex flex-wrap gap-1 mb-3">${card.tags.map(t => `<span class="text-xs bg-[#a855f7]/20 text-[#a855f7] px-3 py-0.5 rounded-3xl">#${t}</span>`).join('')}</div>` : ''}
-        ${card.personality ? `<div class="text-sm text-white/70 mb-1">性格：${card.personality.substring(0,40)}...</div>` : ''}
-        ${card.background ? `<div class="text-xs text-white/50 line-clamp-2">${card.background.substring(0,80)}...</div>` : ''}
+        ${card.gender ? `<div class="text-xs text-blue-400">性别：${card.gender}</div>` : ''}
+        ${card.age ? `<div class="text-xs text-blue-400">年龄：${card.age}</div>` : ''}
+        ${card.tags && card.tags.length ? `<div class="flex flex-wrap gap-1 mt-3">${card.tags.map(t => `<span class="text-xs bg-[#a855f7]/20 text-[#a855f7] px-3 py-0.5 rounded-3xl">#${t}</span>`).join('')}</div>` : ''}
+        ${card.personality ? `<div class="text-sm text-white/70 mt-2">性格：${card.personality}</div>` : ''}
       </div>
     `).join('');
   }
 
   function showModal(isEdit = false) {
     document.getElementById('modal').classList.remove('hidden');
-    document.getElementById('modalTitle').textContent = isEdit ? '编辑角色卡' : '新建角色卡';
+    document.getElementById('modalTitle').textContent = isEdit ? '编辑角色卡' : 'AI角色名（必填）';
     document.getElementById('deleteBtn').classList.toggle('hidden', !isEdit);
-    document.getElementById('saveBtn').textContent = isEdit ? '保存修改' : '创建角色卡';
+    document.getElementById('saveBtn').textContent = isEdit ? '保存修改' : '提交';
     document.getElementById('tagChips').innerHTML = '';
+    currentTags = [];
+    currentExampleDialogs = [];
+    document.getElementById('exampleDialogs').innerHTML = '';
+    document.getElementById('advancedToggle').checked = false;
+    document.getElementById('systemPrompt').classList.add('hidden');
   }
 
   function hideModal() {
     document.getElementById('modal').classList.add('hidden');
     currentEditId = null;
-    currentTags = [];
-    ['cardName', 'personality', 'background', 'systemPrompt', 'tagInput'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
-    });
   }
 
   function addTag() {
@@ -351,7 +433,7 @@
   function renderChips() {
     const container = document.getElementById('tagChips');
     container.innerHTML = currentTags.map((tag, i) => `
-      <span class="inline-flex items-center bg-[#a855f7] text-white text-sm px-4 py-1 rounded-3xl">
+      <span class="inline-flex items-center bg-[#3b82f6] text-white text-sm px-4 py-1 rounded-3xl">
         #${tag}
         <span onclick="removeTag(${i});event.stopImmediatePropagation()" class="ml-2 cursor-pointer text-xs">✕</span>
       </span>`).join('');
@@ -362,23 +444,69 @@
     renderChips();
   };
 
+  function addExampleDialog() {
+    const container = document.getElementById('exampleDialogs');
+    const id = Date.now();
+    container.innerHTML += `
+      <div id="ex-${id}" class="flex gap-3 items-start bg-[#1f2937] rounded-2xl p-3">
+        <div class="flex-1">
+          <div class="blue-label mb-1">用户:</div>
+          <input id="user-ex-${id}" placeholder="用户说..." class="w-full bg-[#374151] rounded-2xl px-4 py-3 text-sm">
+        </div>
+        <div class="flex-1">
+          <div class="blue-label mb-1">角色:</div>
+          <input id="role-ex-${id}" placeholder="角色说..." class="w-full bg-[#374151] rounded-2xl px-4 py-3 text-sm">
+          <button onclick="removeExample(${id})" class="text-red-400 text-xs mt-1">删除此示例</button>
+        </div>
+      </div>`;
+  }
+
+  window.removeExample = function(id) {
+    const el = document.getElementById(`ex-${id}`);
+    if (el) el.remove();
+  };
+
+  function toggleAdvanced() {
+    const prompt = document.getElementById('systemPrompt');
+    prompt.classList.toggle('hidden');
+  }
+
   async function saveCard() {
     const name = document.getElementById('cardName').value.trim();
-    if (!name) return alert("角色名称不能为空！");
+    if (!name) return alert("AI角色名不能为空！");
+
+    // 收集示例对话
+    currentExampleDialogs = [];
+    document.querySelectorAll('#exampleDialogs > div').forEach(div => {
+      const userInput = document.getElementById(`user-ex-${div.id.split('-')[1]}`);
+      const roleInput = document.getElementById(`role-ex-${div.id.split('-')[1]}`);
+      const userText = userInput ? userInput.value.trim() : '';
+      const roleText = roleInput ? roleInput.value.trim() : '';
+      if (userText && roleText) currentExampleDialogs.push({ user: userText, role: roleText });
+    });
+
     const payload = {
       owner_id: userId,
       name: name,
       tags: currentTags,
-      personality: document.getElementById('personality').value.trim(),
-      background: document.getElementById('background').value.trim(),
-      system_prompt: document.getElementById('systemPrompt').value.trim() || null
+      gender: document.getElementById('gender').value,
+      age: document.getElementById('age').value,
+      personality: document.getElementById('personality').value,
+      appearance: document.getElementById('appearance').value,
+      kinks: document.getElementById('kinks').value,
+      nsfw: document.getElementById('nsfwToggle').checked,
+      beginner_mode: document.getElementById('beginnerMode').checked,
+      example_dialog: currentExampleDialogs,
+      system_prompt: document.getElementById('systemPrompt').value || null
     };
+
     let error;
     if (currentEditId) {
       ({ error } = await supabaseClient.from('role_cards').update(payload).eq('id', currentEditId));
     } else {
       ({ error } = await supabaseClient.from('role_cards').insert(payload));
     }
+
     if (error) {
       alert("保存失败: " + error.message);
     } else {
@@ -393,12 +521,40 @@
     if (!card) return;
     currentEditId = id;
     currentTags = card.tags || [];
+    currentExampleDialogs = card.example_dialog || [];
+
     document.getElementById('cardName').value = card.name || '';
+    document.getElementById('userRoleName').value = ''; // 用户角色名暂未存表，可后续扩展
+    document.getElementById('nsfwToggle').checked = !!card.nsfw;
+    document.getElementById('gender').value = card.gender || '';
+    document.getElementById('age').value = card.age || '';
     document.getElementById('personality').value = card.personality || '';
-    document.getElementById('background').value = card.background || '';
-    document.getElementById('systemPrompt').value = card.system_prompt || '';
-    showModal(true);
+    document.getElementById('appearance').value = card.appearance || '';
+    document.getElementById('kinks').value = card.kinks || '';
+    document.getElementById('beginnerMode').checked = !!card.beginner_mode;
+
     renderChips();
+
+    // 渲染已有示例对话
+    const container = document.getElementById('exampleDialogs');
+    container.innerHTML = '';
+    currentExampleDialogs.forEach((ex, idx) => {
+      const id = Date.now() + idx;
+      container.innerHTML += `
+        <div id="ex-${id}" class="flex gap-3 items-start bg-[#1f2937] rounded-2xl p-3">
+          <div class="flex-1">
+            <div class="blue-label mb-1">用户:</div>
+            <input id="user-ex-${id}" value="${ex.user || ''}" class="w-full bg-[#374151] rounded-2xl px-4 py-3 text-sm">
+          </div>
+          <div class="flex-1">
+            <div class="blue-label mb-1">角色:</div>
+            <input id="role-ex-${id}" value="${ex.role || ''}" class="w-full bg-[#374151] rounded-2xl px-4 py-3 text-sm">
+            <button onclick="removeExample(${id})" class="text-red-400 text-xs mt-1">删除此示例</button>
+          </div>
+        </div>`;
+    });
+
+    showModal(true);
   }
 
   async function deleteCard() {
@@ -416,29 +572,29 @@
   // ====================== 赚钻石 Tab ======================
   function fakeLottery() {
     alert("🎉 恭喜！你抽中了 50 钻石！（演示）\n\n真实抽奖功能后面再加～");
-    // 后续可在此更新 Supabase 钻石表
   }
 
   // ====================== 我的 Tab ======================
   function loadProfile() {
-    // 头像 & 用户名
     document.getElementById('userAvatar').src = userPhoto;
     document.getElementById('userName').textContent = userName;
     document.getElementById('diamondCount').textContent = "128"; // 后续可从 Supabase 读取
 
-    // 人物卡数量 & 列表
     document.getElementById('cardCount').textContent = allCards.length;
     const list = document.getElementById('myCardsList');
     list.innerHTML = allCards.length ? 
       allCards.map(c => `
         <div class="bg-[#2a0044] rounded-2xl p-4 flex justify-between items-center">
-          <div class="font-medium">${c.name}</div>
+          <div>
+            <div class="font-medium">${c.name}</div>
+            ${c.gender ? `<div class="text-xs text-blue-400">性别：${c.gender}</div>` : ''}
+          </div>
           <div class="text-[#a855f7] text-sm">${c.tags ? c.tags.join(' ') : ''}</div>
         </div>`).join('') : 
       '<div class="text-white/50 text-center py-8">还没有卡片哦～快去创建吧！</div>';
   }
 
-  // 设置功能
+  // ====================== 设置功能 ======================
   async function clearAllData() {
     if (!confirm("⚠️ 确定要清除你**所有**人物卡吗？此操作不可恢复！")) return;
     const { error } = await supabaseClient.from('role_cards').delete().eq('owner_id', userId);
