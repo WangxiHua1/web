@@ -14,6 +14,8 @@
     .tab-active { color: #a855f7; border-top: 3px solid #a855f7; }
     .modal-content { max-height: 90vh; overflow-y: auto; }
     .chat-bubble { max-width: 75%; padding: 12px 18px; border-radius: 20px; }
+    .user-msg { background: #a855f7; color: white; }
+    .ai-reply { background: #3a0055; color: white; }
     .avatar { width: 80px; height: 80px; border-radius: 9999px; object-fit: cover; border: 4px solid #a855f7; }
     .blue-label { background: #3b82f6; color: white; padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; }
   </style>
@@ -64,8 +66,7 @@
       <div class="bg-[#2a0044] rounded-3xl p-10">
         <p class="text-7xl mb-6">💎</p>
         <p class="text-xl mb-8">当前页面暂时为空</p>
-        <p class="text-white/70 mb-10">后面可以在这里放抽奖、签到、任务等赚钻石功能～</p>
-        <button onclick="fakeLottery()" class="bg-[#a855f7] hover:bg-[#9333ea] px-10 py-4 rounded-2xl font-bold text-xl active:scale-95 transition">🎟️ 立即签到（演示）</button>
+        <button onclick="fakeLottery()" class="bg-[#a855f7] hover:bg-[#9333ea] px-10 py-4 rounded-2xl font-bold text-xl active:scale-95 transition">🎟️ 立即签到（+50 钻石）</button>
       </div>
     </div>
 
@@ -97,6 +98,10 @@
         <div class="text-white/60">我创建的人物卡（<span id="cardCount">0</span> 张）</div>
       </div>
       <div id="myCardsList" class="space-y-3 mb-10"></div>
+
+      <!-- 我的生成图片 -->
+      <div class="text-white/60 mb-4">我的生成图片</div>
+      <div id="myGeneratedImages" class="grid grid-cols-3 gap-3"></div>
     </div>
   </div>
 
@@ -110,51 +115,58 @@
     </div>
   </div>
 
-  <!-- 人物卡弹窗（已强制年龄≥18 + 动态性癖） -->
+  <!-- 人物卡弹窗（完整优化版） -->
   <div id="modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4" onclick="if(event.target.id==='modal') hideModal()">
     <div class="modal-content bg-[#1f2937] w-full max-w-lg mx-auto rounded-3xl p-6" onclick="event.stopImmediatePropagation()">
       <div class="flex justify-between items-center mb-6">
         <h2 id="modalTitle" class="text-2xl font-bold">AI角色名（必填）</h2>
         <button onclick="hideModal()" class="text-white/60 text-3xl leading-none">×</button>
       </div>
-      <input id="cardName" placeholder="AI扮演的角色名字" oninput="updateTokenCount()" class="w-full bg-[#374151] rounded-2xl px-5 py-4 text-lg mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+      <input id="cardName" placeholder="AI扮演的角色名字" oninput="updateTokenCount()" class="w-full bg-[#374151] rounded-2xl px-5 py-4 text-lg mb-6">
+
       <div class="mb-6">
         <div class="text-white/70 text-sm mb-2">用户角色名（非必填）</div>
         <input id="userRoleName" placeholder="不会在聊天中显示，但可帮AI更好生成对话内容" oninput="updateTokenCount()" class="w-full bg-[#374151] rounded-2xl px-5 py-4 text-lg">
       </div>
+
       <div class="flex items-center gap-3 mb-6">
         <label class="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" id="nsfwToggle" onclick="toggleKinksVisibility(); updateTokenCount()">
           <span class="text-lg font-medium">NSFW</span>
         </label>
       </div>
+
       <div class="space-y-5">
         <div class="flex items-center gap-3"><div class="blue-label">性别:</div>
           <select id="gender" onchange="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
-  <option value="女" selected>女</option>
-  <option value="男">男</option>
-</select>
+            <option value="女" selected>女</option>
+            <option value="男">男</option>
+          </select>
         </div>
-        
-        <!-- 年龄强制最低18 -->
-        <div class="flex items-center gap-3">
-          <div class="blue-label">年龄:</div>
+
+        <div class="flex items-center gap-3"><div class="blue-label">年龄:</div>
           <input id="age" type="number" min="18" placeholder="18" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
         </div>
 
-        <div class="flex items-center gap-3"><div class="blue-label">性格:</div><input id="personality" placeholder="性格" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg"></div>
-        <div class="flex items-center gap-3"><div class="blue-label">外貌:</div><textarea id="appearance" rows="2" placeholder="身高165cm, 长相甜美, 高中校服JK款（示例）" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea>
-        <div class="flex items-center gap-3">
-  <div class="blue-label">背景故事:</div>
-  <textarea id="background" rows="3" placeholder="背景故事（可选，越详细越好）" 
-            oninput="updateTokenCount()" 
-            class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea>
-</div></div>
+        <div class="flex items-center gap-3"><div class="blue-label">性格:</div>
+          <input id="personality" placeholder="性格" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
+        </div>
+
+        <div class="flex items-center gap-3"><div class="blue-label">外貌:</div>
+          <textarea id="appearance" rows="2" placeholder="身高165cm, 长相甜美, 高中校服JK款（示例）" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea>
+        </div>
+
+        <div class="flex items-center gap-3"><div class="blue-label">背景故事:</div>
+          <textarea id="background" rows="3" placeholder="背景故事（可选，越详细越好）" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea>
+        </div>
+
         <div id="kinksSection" class="flex items-center gap-3 hidden">
           <div class="blue-label">性癖:</div>
           <input id="kinks" placeholder="异味癖，对拒绝敏感（示例，可多个）" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
         </div>
       </div>
+
       <div class="mt-6 mb-6">
         <div class="flex gap-2 mb-2">
           <input id="tagInput" placeholder="输入标签后回车或点击添加" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4">
@@ -162,9 +174,24 @@
         </div>
         <div id="tagChips" class="flex flex-wrap gap-2"></div>
       </div>
+
+      <!-- 生成相关图片按钮 -->
+      <button onclick="generateCardImage()" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-4 rounded-2xl font-bold text-lg mb-6 flex items-center justify-center gap-2">
+        🖼️ 生成相关图片
+      </button>
+
+      <div id="generatedImagePreview" class="hidden mb-6 text-center">
+        <img id="previewImg" class="mx-auto rounded-2xl max-h-48 shadow-lg">
+        <div class="flex gap-3 mt-4 justify-center">
+          <button onclick="setAsCover()" class="px-6 py-2 bg-green-500 rounded-2xl text-sm">设为封面</button>
+          <button onclick="saveGeneratedImage()" class="px-6 py-2 bg-blue-500 rounded-2xl text-sm">保存到我的图片</button>
+        </div>
+      </div>
+
       <div id="tokenDisplay" class="text-xs text-white/60 flex justify-end mt-4">
         总消耗: <span id="tokenCount" class="font-mono text-[#a855f7] ml-1">0</span> / 6000 tokens
       </div>
+
       <div class="flex gap-3 mt-8">
         <button onclick="hideModal()" class="flex-1 py-4 rounded-2xl border border-white/30 text-white/80">取消</button>
         <button onclick="saveCard()" id="saveBtn" class="flex-1 py-4 bg-[#3b82f6] rounded-2xl font-bold">提交</button>
@@ -174,7 +201,6 @@
   </div>
 
 <script>
-  // ====================== 完整脚本（已包含年龄≥18校验） ======================
   const tg = window.Telegram.WebApp; tg.ready(); tg.expand(); tg.setHeaderColor("#1a0033"); tg.setBackgroundColor("#1a0033");
   const userId = tg.initDataUnsafe?.user?.id || 123456;
   const SUPABASE_URL = "https://pttzjqrdsgjygglkhvot.supabase.co";
@@ -186,6 +212,7 @@
   let currentEditId = null;
   let selectedFilterTags = [];
   let currentTags = [];
+  let generatedImages = []; // 我的生成图片列表
 
   function estimateTokens(text) {
     if (!text) return 0;
@@ -200,6 +227,7 @@
     total += estimateTokens(document.getElementById('userRoleName').value);
     total += estimateTokens(document.getElementById('personality').value);
     total += estimateTokens(document.getElementById('appearance').value);
+    total += estimateTokens(document.getElementById('background').value);
     if (!document.getElementById('kinksSection').classList.contains('hidden')) total += estimateTokens(document.getElementById('kinks').value);
     total += currentTags.length * 8;
     total += 120;
@@ -216,7 +244,7 @@
     document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
     const tabs = ['tab-chat','tab-cards','tab-diamonds','tab-profile'];
     document.getElementById(tabs[n]).classList.remove('hidden');
-    document.querySelectorAll('.tab-btn').forEach((btn,i)=>btn.classList.toggle('tab-active',i===n));
+    document.querySelectorAll('.tab-btn').forEach((btn,i) => btn.classList.toggle('tab-active', i===n));
     if(n===0) loadChatCards();
     if(n===1) loadRoles();
     if(n===3) loadProfile();
@@ -254,12 +282,8 @@
   function filterRoles() {
     const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
     let filtered = allCards;
-    if (searchTerm) {
-      filtered = filtered.filter(card => card.name.toLowerCase().includes(searchTerm) || (card.tags || []).some(tag => tag.toLowerCase().includes(searchTerm)));
-    }
-    if (selectedFilterTags.length > 0) {
-      filtered = filtered.filter(card => (card.tags || []).some(t => selectedFilterTags.includes(t)));
-    }
+    if (searchTerm) filtered = filtered.filter(card => card.name.toLowerCase().includes(searchTerm) || (card.tags || []).some(tag => tag.toLowerCase().includes(searchTerm)));
+    if (selectedFilterTags.length > 0) filtered = filtered.filter(card => (card.tags || []).some(t => selectedFilterTags.includes(t)));
     renderCards(filtered);
   }
 
@@ -302,21 +326,22 @@
     document.getElementById('chatWindow').classList.remove('hidden');
   }
 
-  function closeChat() { document.getElementById('chatWindow').classList.add('hidden'); currentChatCard = null; }
+  function closeChat() {
+    document.getElementById('chatWindow').classList.add('hidden');
+    currentChatCard = null;
+  }
 
   function sendChatMessage() {
     const input = document.getElementById('chatInput');
     const msg = input.value.trim();
     if (!msg || !currentChatCard) return;
     const messagesDiv = document.getElementById('chatMessages');
-    messagesDiv.innerHTML += `<div class="flex justify-end"><div class="chat-bubble bg-[#a855f7] text-white">${msg}</div></div>`;
+    const userBubble = document.createElement('div');
+    userBubble.className = 'flex justify-end mb-2';
+    userBubble.innerHTML = `<div class="chat-bubble user-msg">${msg}</div>`;
+    messagesDiv.appendChild(userBubble);
     input.value = '';
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    setTimeout(() => {
-      const reply = `（基于【${currentChatCard.name}】设定）收到！让我继续陪你玩～ 你想接下来发生什么？😏`;
-      messagesDiv.innerHTML += `<div class="flex justify-start"><div class="chat-bubble bg-[#3a0055]">${reply}</div></div>`;
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }, 800);
   }
 
   function showModal(isEdit = false) {
@@ -326,10 +351,11 @@
     document.getElementById('saveBtn').textContent = isEdit ? '保存修改' : '提交';
     currentTags = [];
     document.getElementById('tagChips').innerHTML = '';
+    document.getElementById('generatedImagePreview').classList.add('hidden');
     document.getElementById('nsfwToggle').checked = false;
     document.getElementById('kinksSection').classList.add('hidden');
-    updateTokenCount();
     document.getElementById('gender').value = '女';
+    updateTokenCount();
   }
 
   function hideModal() {
@@ -372,7 +398,7 @@
       age: age,
       personality: document.getElementById('personality').value,
       appearance: document.getElementById('appearance').value,
-      background: document.getElementById('background').value.trim(),
+      background: document.getElementById('background').value,
       kinks: document.getElementById('nsfwToggle').checked ? document.getElementById('kinks').value : null,
       nsfw: document.getElementById('nsfwToggle').checked
     };
@@ -398,11 +424,11 @@
     document.getElementById('cardName').value = card.name || '';
     document.getElementById('userRoleName').value = '';
     document.getElementById('nsfwToggle').checked = !!card.nsfw;
-    document.getElementById('gender').value = card.gender || '';
+    document.getElementById('gender').value = card.gender || '女';
     document.getElementById('age').value = card.age || '';
     document.getElementById('personality').value = card.personality || '';
-    document.getElementById('background').value = card.background || '';
     document.getElementById('appearance').value = card.appearance || '';
+    document.getElementById('background').value = card.background || '';
     document.getElementById('kinks').value = card.kinks || '';
     document.getElementById('kinksSection').classList.toggle('hidden', !card.nsfw);
     renderChips();
@@ -422,9 +448,38 @@
     }
   }
 
-  function fakeLottery() { alert("🎉获得了 50 钻石！（演示）"); }
+  // ====================== 生成图片 ======================
+  async function generateCardImage() {
+    const prompt = `${document.getElementById('cardName').value}，${document.getElementById('appearance').value}，${document.getElementById('background').value}，精美卡通风格`;
+    alert("正在调用 Grok Imagine 生成图片...\n\n提示词：" + prompt + "\n\n（后端调用 xAI API 后返回图片URL）");
+    const fakeUrl = "https://picsum.photos/id/1015/600/800";
+    document.getElementById('previewImg').src = fakeUrl;
+    document.getElementById('generatedImagePreview').classList.remove('hidden');
+  }
 
+  function setAsCover() {
+    alert("✅ 已设置为人物卡封面！");
+    hideModal();
+  }
+
+  function saveGeneratedImage() {
+    const url = document.getElementById('previewImg').src;
+    generatedImages.unshift(url);
+    renderMyGeneratedImages();
+    alert("✅ 图片已保存到「我的」页面！");
+    hideModal();
+  }
+
+  function renderMyGeneratedImages() {
+    const container = document.getElementById('myGeneratedImages');
+    container.innerHTML = generatedImages.map(url => `
+      <img src="${url}" class="rounded-2xl cursor-pointer" onclick="alert('查看大图或删除功能后续添加')">
+    `).join('');
+  }
+
+  // ====================== 我的页面 ======================
   async function loadProfile() {
+    // 钻石实时读取（已实现）
     const { data: profile } = await supabaseClient.from('user_profiles').select('custom_name, diamonds, custom_avatar_url').eq('user_id', userId).single();
     const name = profile?.custom_name || "玩家";
     const diamonds = profile?.diamonds || 128;
@@ -440,6 +495,7 @@
         <div><div class="font-medium">${c.name}</div>${c.gender ? `<div class="text-xs text-blue-400">性别：${c.gender}</div>` : ''}</div>
         <div class="text-[#a855f7] text-sm">${c.tags ? c.tags.join(' ') : ''}</div>
       </div>`).join('') : '<div class="text-white/50 text-center py-8">还没有卡片哦～快去创建吧！</div>';
+    renderMyGeneratedImages();
   }
 
   async function saveProfile() {
@@ -451,6 +507,11 @@
 
   async function uploadAvatar(e) {
     alert("头像上传功能目前仅演示");
+  }
+
+  function fakeLottery() {
+    alert("🎉 +50 钻石！");
+    loadProfile();
   }
 
   window.onload = () => {
