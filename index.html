@@ -20,20 +20,16 @@
 </head>
 <body class="text-white min-h-screen bg-[#1a0033] pb-20">
 
-  <!-- 顶部标题 -->
   <div class="max-w-2xl mx-auto p-4">
     <h1 class="text-3xl font-bold text-center mb-4">DND AI 助手</h1>
   </div>
 
-  <!-- Tab 内容区域 -->
   <div class="max-w-2xl mx-auto px-4">
 
     <!-- 聊天 Tab -->
     <div id="tab-chat" class="tab-content">
       <h2 class="text-2xl font-bold mb-4">选择人物卡开始聊天</h2>
       <div id="chatCardsGrid" class="grid grid-cols-2 gap-4 mb-8"></div>
-      
-      <!-- 聊天窗口 -->
       <div id="chatWindow" class="hidden bg-[#2a0044] rounded-3xl p-4 h-[420px] flex flex-col">
         <div class="flex items-center gap-3 mb-4 border-b border-white/10 pb-3">
           <div id="chatCardName" class="font-bold text-lg"></div>
@@ -41,15 +37,13 @@
         </div>
         <div id="chatMessages" class="flex-1 overflow-y-auto space-y-4 py-2"></div>
         <div class="flex gap-2 mt-auto">
-          <input id="chatInput" placeholder="输入消息..." 
-                 class="flex-1 bg-[#1a0033] rounded-2xl px-5 py-3 focus:outline-none">
-          <button onclick="sendChatMessage()" 
-                  class="bg-[#a855f7] px-8 rounded-2xl font-bold">发送</button>
+          <input id="chatInput" placeholder="输入消息..." class="flex-1 bg-[#1a0033] rounded-2xl px-5 py-3 focus:outline-none">
+          <button onclick="sendChatMessage()" class="bg-[#a855f7] px-8 rounded-2xl font-bold">发送</button>
         </div>
       </div>
     </div>
 
-    <!-- 人物卡 Tab -->
+    <!-- 人物卡 Tab（标签搜索已优化） -->
     <div id="tab-cards" class="tab-content hidden">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-3xl font-bold">人物卡</h2>
@@ -57,7 +51,10 @@
       </div>
       <input id="searchInput" onkeyup="if(event.key==='Enter') filterRoles()" placeholder="搜索角色或标签..." 
              class="w-full bg-[#2a0044] border border-white/10 rounded-2xl px-5 py-4 text-lg mb-4 focus:outline-none focus:border-[#a855f7]">
-      <div id="tagFilters" class="flex flex-wrap gap-2 mb-6"></div>
+      <div class="flex items-center justify-between mb-4">
+        <div id="tagFilters" class="flex flex-wrap gap-2 flex-1"></div>
+        <button onclick="clearAllFilters()" id="clearFilterBtn" class="hidden text-xs bg-white/10 hover:bg-white/20 px-4 py-1 rounded-3xl">清除筛选</button>
+      </div>
       <div id="rolesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
     </div>
 
@@ -68,18 +65,13 @@
         <p class="text-7xl mb-6">💎</p>
         <p class="text-xl mb-8">当前页面暂时为空</p>
         <p class="text-white/70 mb-10">后面可以在这里放抽奖、签到、任务等赚钻石功能～</p>
-        <button onclick="fakeLottery()" 
-                class="bg-[#a855f7] hover:bg-[#9333ea] px-10 py-4 rounded-2xl font-bold text-xl active:scale-95 transition">
-          🎟️ 立即抽奖（演示）
-        </button>
+        <button onclick="fakeLottery()" class="bg-[#a855f7] hover:bg-[#9333ea] px-10 py-4 rounded-2xl font-bold text-xl active:scale-95 transition">🎟️ 立即抽奖（演示）</button>
       </div>
     </div>
 
     <!-- 我的 Tab -->
     <div id="tab-profile" class="tab-content hidden">
       <h2 class="text-3xl font-bold mb-6">我的</h2>
-      
-      <!-- 头像 + 用户信息 -->
       <div class="bg-[#2a0044] rounded-3xl p-6 mb-8 flex items-center gap-4">
         <img id="userAvatar" src="https://via.placeholder.com/64/a855f7/ffffff?text=👤" alt="头像" class="avatar">
         <div class="flex-1">
@@ -91,34 +83,21 @@
           <div id="diamondCount" class="text-5xl font-bold text-[#a855f7]">128</div>
         </div>
       </div>
-
-      <!-- 我创建的人物卡 -->
       <div class="mb-4 flex justify-between items-center">
         <div class="text-white/60">我创建的人物卡（<span id="cardCount">0</span> 张）</div>
       </div>
       <div id="myCardsList" class="space-y-3 mb-10"></div>
-
-      <!-- 设置区域 -->
       <div class="bg-[#2a0044] rounded-3xl p-6">
         <div class="text-lg font-bold mb-4">设置</div>
         <div onclick="clearAllData()" class="flex items-center justify-between py-4 border-b border-white/10 cursor-pointer hover:bg-white/5 px-2 rounded-2xl">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl">🗑️</span>
-            <div>清除所有人物卡</div>
-          </div>
+          <div class="flex items-center gap-3"><span class="text-2xl">🗑️</span><div>清除所有人物卡</div></div>
           <span class="text-red-400 text-sm">危险操作</span>
         </div>
         <div onclick="showAbout()" class="flex items-center justify-between py-4 border-b border-white/10 cursor-pointer hover:bg-white/5 px-2 rounded-2xl">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl">ℹ️</span>
-            <div>关于 DND AI 助手</div>
-          </div>
+          <div class="flex items-center gap-3"><span class="text-2xl">ℹ️</span><div>关于 DND AI 助手</div></div>
         </div>
         <div onclick="logout()" class="flex items-center justify-between py-4 cursor-pointer hover:bg-white/5 px-2 rounded-2xl">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl">🚪</span>
-            <div>退出登录（重新打开 WebApp）</div>
-          </div>
+          <div class="flex items-center gap-3"><span class="text-2xl">🚪</span><div>退出登录</div></div>
         </div>
       </div>
     </div>
@@ -127,103 +106,49 @@
   <!-- 底部导航栏 -->
   <div class="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto bg-[#2a0044] border-t border-white/10">
     <div class="grid grid-cols-4 text-center py-2">
-      <button onclick="switchTab(0)" class="tab-btn flex flex-col items-center py-2 text-white/70 hover:text-[#a855f7]">
-        💬<span class="text-xs mt-1">聊天</span>
-      </button>
-      <button onclick="switchTab(1)" class="tab-btn flex flex-col items-center py-2 text-white/70 hover:text-[#a855f7]">
-        🃏<span class="text-xs mt-1">人物卡</span>
-      </button>
-      <button onclick="switchTab(2)" class="tab-btn flex flex-col items-center py-2 text-white/70 hover:text-[#a855f7]">
-        💎<span class="text-xs mt-1">赚钻石</span>
-      </button>
-      <button onclick="switchTab(3)" class="tab-btn flex flex-col items-center py-2 text-white/70 hover:text-[#a855f7]">
-        👤<span class="text-xs mt-1">我的</span>
-      </button>
+      <button onclick="switchTab(0)" class="tab-btn flex flex-col items-center py-2 text-white/70 hover:text-[#a855f7]">💬<span class="text-xs mt-1">聊天</span></button>
+      <button onclick="switchTab(1)" class="tab-btn flex flex-col items-center py-2 text-white/70 hover:text-[#a855f7]">🃏<span class="text-xs mt-1">人物卡</span></button>
+      <button onclick="switchTab(2)" class="tab-btn flex flex-col items-center py-2 text-white/70 hover:text-[#a855f7]">💎<span class="text-xs mt-1">赚钻石</span></button>
+      <button onclick="switchTab(3)" class="tab-btn flex flex-col items-center py-2 text-white/70 hover:text-[#a855f7]">👤<span class="text-xs mt-1">我的</span></button>
     </div>
   </div>
 
-  <!-- 🔥 全新专业人物卡弹窗（完全按你3张图片样式重做） -->
+  <!-- 专业人物卡弹窗 -->
   <div id="modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4" onclick="if(event.target.id==='modal') hideModal()">
     <div class="modal-content bg-[#1f2937] w-full max-w-lg mx-auto rounded-3xl p-6" onclick="event.stopImmediatePropagation()">
-      
       <div class="flex justify-between items-center mb-6">
         <h2 id="modalTitle" class="text-2xl font-bold">AI角色名（必填）</h2>
         <button onclick="hideModal()" class="text-white/60 text-3xl leading-none">×</button>
       </div>
-
-      <!-- AI角色名 -->
-      <input id="cardName" placeholder="AI扮演的角色名字" 
-             class="w-full bg-[#374151] rounded-2xl px-5 py-4 text-lg mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500">
-
-      <!-- 用户角色名（非必填） -->
+      <input id="cardName" placeholder="AI扮演的角色名字" class="w-full bg-[#374151] rounded-2xl px-5 py-4 text-lg mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500">
       <div class="mb-6">
         <div class="text-white/70 text-sm mb-2">用户角色名（非必填）</div>
-        <input id="userRoleName" placeholder="不会在聊天中显示，但可帮AI更好生成对话内容" 
-               class="w-full bg-[#374151] rounded-2xl px-5 py-4 text-lg">
+        <input id="userRoleName" placeholder="不会在聊天中显示，但可帮AI更好生成对话内容" class="w-full bg-[#374151] rounded-2xl px-5 py-4 text-lg">
       </div>
-
-      <!-- NSFW -->
       <div class="flex items-center gap-3 mb-6">
         <label class="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" id="nsfwToggle" class="w-5 h-5 accent-blue-500">
           <span class="text-lg font-medium">NSFW</span>
         </label>
       </div>
-
-      <!-- 结构化字段（蓝标签风格） -->
       <div class="space-y-5">
-        <div class="flex items-center gap-3">
-          <div class="blue-label">性别:</div>
-          <select id="gender" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
-            <option value="">选择</option>
-            <option value="女">女</option>
-            <option value="男">男</option>
-            <option value="其他">其他</option>
-          </select>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <div class="blue-label">年龄:</div>
-          <input id="age" placeholder="18（示例，最小18岁）" 
-                 class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
-        </div>
-
-        <div class="flex items-center gap-3">
-          <div class="blue-label">性格:</div>
-          <input id="personality" placeholder="性格" 
-                 class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
-        </div>
-
-        <div class="flex items-center gap-3">
-          <div class="blue-label">外貌:</div>
-          <textarea id="appearance" rows="2" placeholder="身高165cm, 长相甜美, 高中校服JK款（示例）外貌（身形，长相，穿着）" 
-                    class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <div class="blue-label">性癖:</div>
-          <input id="kinks" placeholder="异味癖，对拒绝敏感（示例，可多个）" 
-                 class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
-        </div>
+        <div class="flex items-center gap-3"><div class="blue-label">性别:</div><select id="gender" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg"><option value="">选择</option><option value="女">女</option><option value="男">男</option><option value="其他">其他</option></select></div>
+        <div class="flex items-center gap-3"><div class="blue-label">年龄:</div><input id="age" placeholder="18（示例，最小18岁）" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg"></div>
+        <div class="flex items-center gap-3"><div class="blue-label">性格:</div><input id="personality" placeholder="性格" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg"></div>
+        <div class="flex items-center gap-3"><div class="blue-label">外貌:</div><textarea id="appearance" rows="2" placeholder="身高165cm, 长相甜美, 高中校服JK款（示例）" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea></div>
+        <div class="flex items-center gap-3"><div class="blue-label">性癖:</div><input id="kinks" placeholder="异味癖，对拒绝敏感（示例，可多个）" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg"></div>
       </div>
-
-      <!-- 标签 -->
       <div class="mt-6 mb-6">
         <div class="flex gap-2 mb-2">
-          <input id="tagInput" placeholder="输入标签后回车或点击添加" 
-                 class="flex-1 bg-[#374151] rounded-2xl px-5 py-4" onkeydown="if(event.key==='Enter') addTag()">
+          <input id="tagInput" placeholder="输入标签后回车或点击添加" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4" onkeydown="if(event.key==='Enter') addTag()">
           <button onclick="addTag()" class="bg-blue-500 px-6 rounded-2xl font-bold">添加</button>
         </div>
         <div id="tagChips" class="flex flex-wrap gap-2"></div>
       </div>
-
-      <!-- 开启新手模式 -->
       <div class="flex items-center gap-2 mb-6">
         <input type="checkbox" id="beginnerMode" class="w-5 h-5 accent-blue-500">
         <span class="text-white/80">开启新手模式</span>
       </div>
-
-      <!-- 对话示例 -->
       <div class="mb-6">
         <div class="flex justify-between items-center mb-3">
           <div class="text-white/70">对话示例</div>
@@ -231,43 +156,26 @@
         </div>
         <div id="exampleDialogs" class="space-y-3 bg-[#374151] rounded-3xl p-4"></div>
       </div>
-
-      <!-- 切换高级模式 -->
       <div class="mb-6">
         <div onclick="toggleAdvanced()" class="flex items-center justify-between cursor-pointer py-2">
           <span class="text-white/70">切换高级模式</span>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="advancedToggle" class="sr-only peer">
-            <div class="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:bg-blue-500"></div>
-          </label>
+          <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="advancedToggle" class="sr-only peer"><div class="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:bg-blue-500"></div></label>
         </div>
-        <textarea id="systemPrompt" rows="4" placeholder="完整系统提示词（可选）" 
-                  class="hidden w-full mt-3 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea>
+        <textarea id="systemPrompt" rows="4" placeholder="完整系统提示词（可选）" class="hidden w-full mt-3 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea>
       </div>
-
       <div class="flex gap-3 mt-8">
         <button onclick="hideModal()" class="flex-1 py-4 rounded-2xl border border-white/30 text-white/80">取消</button>
         <button onclick="saveCard()" id="saveBtn" class="flex-1 py-4 bg-[#3b82f6] rounded-2xl font-bold">提交</button>
       </div>
-
-      <button onclick="deleteCard()" id="deleteBtn" 
-              class="hidden mt-4 w-full py-4 text-red-400 border border-red-400/50 rounded-2xl hover:bg-red-400/10">🗑 删除这张角色卡</button>
+      <button onclick="deleteCard()" id="deleteBtn" class="hidden mt-4 w-full py-4 text-red-400 border border-red-400/50 rounded-2xl hover:bg-red-400/10">🗑 删除这张角色卡</button>
     </div>
   </div>
 
 <script>
-  // ====================== Telegram & Supabase 配置 ======================
-  const tg = window.Telegram.WebApp;
-  tg.ready();
-  tg.expand();
-  tg.setHeaderColor("#1a0033");
-  tg.setBackgroundColor("#1a0033");
-
-  const tgUser = tg.initDataUnsafe?.user || {};
-  const userId = tgUser.id || 123456;
-  const userName = tgUser.username || tgUser.first_name || "玩家";
-  const userPhoto = tgUser.photo_url || "https://via.placeholder.com/64/a855f7/ffffff?text=👤";
-
+  const tg = window.Telegram.WebApp; tg.ready(); tg.expand(); tg.setHeaderColor("#1a0033"); tg.setBackgroundColor("#1a0033");
+  const userId = tg.initDataUnsafe?.user?.id || 123456;
+  const userName = tg.initDataUnsafe?.user?.username || tg.initDataUnsafe?.user?.first_name || "玩家";
+  const userPhoto = tg.initDataUnsafe?.user?.photo_url || "https://via.placeholder.com/64/a855f7/ffffff?text=👤";
   const SUPABASE_URL = "https://pttzjqrdsgjygglkhvot.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C";
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -279,22 +187,79 @@
   let currentTags = [];
   let currentExampleDialogs = [];
 
-  // ====================== Tab 切换 ======================
   function switchTab(n) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-    const tabs = ['tab-chat', 'tab-cards', 'tab-diamonds', 'tab-profile'];
+    const tabs = ['tab-chat','tab-cards','tab-diamonds','tab-profile'];
     document.getElementById(tabs[n]).classList.remove('hidden');
-    
-    document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-      btn.classList.toggle('tab-active', i === n);
-    });
-
-    if (n === 0) loadChatCards();
-    if (n === 1) loadRoles();
-    if (n === 3) loadProfile();
+    document.querySelectorAll('.tab-btn').forEach((btn,i)=>btn.classList.toggle('tab-active',i===n));
+    if(n===0) loadChatCards();
+    if(n===1) loadRoles();
+    if(n===3) loadProfile();
   }
 
-  // ====================== 聊天 Tab ======================
+  async function loadRoles() {
+    const { data } = await supabaseClient.from('role_cards').select('*').eq('owner_id', userId).order('id', { ascending: false });
+    allCards = data || [];
+    renderFilterTags();
+    filterRoles();
+  }
+
+  function renderFilterTags() {
+    const container = document.getElementById('tagFilters');
+    const allTags = [...new Set(allCards.flatMap(c => c.tags || []))].sort();
+    container.innerHTML = allTags.length ? allTags.map(tag => `
+      <span onclick="toggleFilterTag('${tag}')" class="inline-block px-4 py-1 bg-[#3a0055] hover:bg-[#a855f7] text-sm rounded-3xl cursor-pointer ${selectedFilterTags.includes(tag)?'bg-[#a855f7] text-white':''}">#${tag}</span>`).join('') : `<div class="text-sm text-white/40">创建卡片后这里会出现可点击标签</div>`;
+    document.getElementById('clearFilterBtn').classList.toggle('hidden', selectedFilterTags.length === 0);
+  }
+
+  function toggleFilterTag(tag) {
+    if (selectedFilterTags.includes(tag)) selectedFilterTags = selectedFilterTags.filter(t => t !== tag);
+    else selectedFilterTags.push(tag);
+    filterRoles();
+    renderFilterTags();
+  }
+
+  function clearAllFilters() {
+    selectedFilterTags = [];
+    document.getElementById('searchInput').value = '';
+    filterRoles();
+    renderFilterTags();
+  }
+
+  function filterRoles() {
+    const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+    let filtered = allCards;
+    if (searchTerm) {
+      filtered = filtered.filter(card => {
+        const nameMatch = card.name.toLowerCase().includes(searchTerm);
+        const tagMatch = (card.tags || []).some(tag => tag.toLowerCase().includes(searchTerm));
+        return nameMatch || tagMatch;
+      });
+    }
+    if (selectedFilterTags.length > 0) {
+      filtered = filtered.filter(card => (card.tags || []).some(t => selectedFilterTags.includes(t)));
+    }
+    renderCards(filtered);
+  }
+
+  function renderCards(cards) {
+    const grid = document.getElementById('rolesGrid');
+    if (!cards.length) {
+      grid.innerHTML = `<div class="col-span-full text-center py-12 text-white/50">没有找到匹配的角色卡～</div>`;
+      return;
+    }
+    grid.innerHTML = cards.map(card => `
+      <div onclick="editCard(${card.id})" class="card bg-[#2a0044] rounded-3xl overflow-hidden p-5 cursor-pointer">
+        <div class="font-bold text-xl mb-1">${card.name}</div>
+        ${card.gender ? `<span class="inline-block px-3 py-0.5 text-xs bg-blue-500 rounded-full">${card.gender}</span>` : ''}
+        ${card.age ? `<span class="ml-2 text-xs text-blue-400">年龄 ${card.age}</span>` : ''}
+        ${card.nsfw ? `<span class="ml-2 inline-block px-3 py-0.5 text-xs bg-red-500 rounded-full">NSFW</span>` : ''}
+        ${card.tags && card.tags.length ? `<div class="flex flex-wrap gap-1 mt-3">${card.tags.map(t=>`<span class="text-xs bg-[#a855f7]/20 text-[#a855f7] px-3 py-0.5 rounded-3xl">#${t}</span>`).join('')}</div>` : ''}
+        ${card.personality ? `<div class="text-sm text-white/70 mt-3">性格：${card.personality}</div>` : ''}
+        ${card.appearance ? `<div class="text-xs text-white/50 line-clamp-2 mt-1">${card.appearance}</div>` : ''}
+      </div>`).join('');
+  }
+
   function loadChatCards() {
     const grid = document.getElementById('chatCardsGrid');
     if (!allCards.length) {
@@ -304,10 +269,8 @@
     grid.innerHTML = allCards.map(card => `
       <div onclick="startChat(${card.id})" class="card bg-[#2a0044] rounded-3xl p-5 cursor-pointer">
         <div class="font-bold text-lg">${card.name}</div>
-        ${card.gender ? `<div class="text-xs text-blue-400 mt-1">性别：${card.gender}</div>` : ''}
-        ${card.tags && card.tags.length ? `<div class="flex flex-wrap gap-1 mt-2">${card.tags.map(t => `<span class="text-xs bg-[#a855f7]/20 px-3 py-0.5 rounded-3xl">#${t}</span>`).join('')}</div>` : ''}
-      </div>
-    `).join('');
+        ${card.tags && card.tags.length ? `<div class="flex flex-wrap gap-1 mt-2">${card.tags.map(t=>`<span class="text-xs bg-[#a855f7]/20 px-3 py-0.5 rounded-3xl">#${t}</span>`).join('')}</div>` : ''}
+      </div>`).join('');
   }
 
   function startChat(id) {
@@ -327,80 +290,15 @@
     const input = document.getElementById('chatInput');
     const msg = input.value.trim();
     if (!msg || !currentChatCard) return;
-    
     const messagesDiv = document.getElementById('chatMessages');
     messagesDiv.innerHTML += `<div class="flex justify-end"><div class="chat-bubble bg-[#a855f7] text-white">${msg}</div></div>`;
     input.value = '';
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    
-    // 模拟 AI 回复（后续可替换为真实 xAI API 调用）
     setTimeout(() => {
-      const reply = `（基于【${currentChatCard.name}】设定）收到！让我用这个角色继续陪你玩～ 你想接下来发生什么？😏`;
+      const reply = `（基于【${currentChatCard.name}】设定）收到！让我继续陪你玩～ 你想接下来发生什么？😏`;
       messagesDiv.innerHTML += `<div class="flex justify-start"><div class="chat-bubble bg-[#3a0055]">${reply}</div></div>`;
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }, 800);
-  }
-
-  // ====================== 人物卡 Tab ======================
-  async function loadRoles() {
-    const { data, error } = await supabaseClient
-      .from('role_cards')
-      .select('*')
-      .eq('owner_id', userId)
-      .order('id', { ascending: false });
-    if (error) console.error(error);
-    allCards = data || [];
-    renderFilterTags();
-    filterRoles();
-  }
-
-  function renderFilterTags() {
-    const container = document.getElementById('tagFilters');
-    const allTags = [...new Set(allCards.flatMap(c => c.tags || []))].sort();
-    container.innerHTML = allTags.length ? 
-      `<div class="text-sm text-white/60 mb-1">标签过滤：</div>` + 
-      allTags.map(tag => `
-        <span onclick="toggleFilterTag('${tag}')" 
-              class="tag inline-block px-4 py-1 bg-[#3a0055] hover:bg-[#a855f7] text-sm rounded-3xl cursor-pointer ${selectedFilterTags.includes(tag) ? 'bg-[#a855f7] text-white' : ''}">
-          #${tag}
-        </span>`).join('') : '';
-  }
-
-  function toggleFilterTag(tag) {
-    if (selectedFilterTags.includes(tag)) {
-      selectedFilterTags = selectedFilterTags.filter(t => t !== tag);
-    } else {
-      selectedFilterTags.push(tag);
-    }
-    filterRoles();
-    renderFilterTags();
-  }
-
-  function filterRoles() {
-    const search = document.getElementById('searchInput').value.trim().toLowerCase();
-    let filtered = allCards;
-    if (search) filtered = filtered.filter(c => c.name.toLowerCase().includes(search));
-    if (selectedFilterTags.length > 0) {
-      filtered = filtered.filter(c => (c.tags || []).some(t => selectedFilterTags.includes(t)));
-    }
-    renderCards(filtered);
-  }
-
-  function renderCards(cards) {
-    const grid = document.getElementById('rolesGrid');
-    if (!cards.length) {
-      grid.innerHTML = `<div class="col-span-full text-center py-12 text-white/50">没有找到匹配的角色卡～</div>`;
-      return;
-    }
-    grid.innerHTML = cards.map(card => `
-      <div onclick="editCard(${card.id})" class="card bg-[#2a0044] rounded-3xl overflow-hidden p-5 cursor-pointer">
-        <div class="font-bold text-xl mb-2">${card.name}</div>
-        ${card.gender ? `<div class="text-xs text-blue-400">性别：${card.gender}</div>` : ''}
-        ${card.age ? `<div class="text-xs text-blue-400">年龄：${card.age}</div>` : ''}
-        ${card.tags && card.tags.length ? `<div class="flex flex-wrap gap-1 mt-3">${card.tags.map(t => `<span class="text-xs bg-[#a855f7]/20 text-[#a855f7] px-3 py-0.5 rounded-3xl">#${t}</span>`).join('')}</div>` : ''}
-        ${card.personality ? `<div class="text-sm text-white/70 mt-2">性格：${card.personality}</div>` : ''}
-      </div>
-    `).join('');
   }
 
   function showModal(isEdit = false) {
@@ -408,9 +306,9 @@
     document.getElementById('modalTitle').textContent = isEdit ? '编辑角色卡' : 'AI角色名（必填）';
     document.getElementById('deleteBtn').classList.toggle('hidden', !isEdit);
     document.getElementById('saveBtn').textContent = isEdit ? '保存修改' : '提交';
-    document.getElementById('tagChips').innerHTML = '';
     currentTags = [];
     currentExampleDialogs = [];
+    document.getElementById('tagChips').innerHTML = '';
     document.getElementById('exampleDialogs').innerHTML = '';
     document.getElementById('advancedToggle').checked = false;
     document.getElementById('systemPrompt').classList.add('hidden');
@@ -433,10 +331,7 @@
   function renderChips() {
     const container = document.getElementById('tagChips');
     container.innerHTML = currentTags.map((tag, i) => `
-      <span class="inline-flex items-center bg-[#3b82f6] text-white text-sm px-4 py-1 rounded-3xl">
-        #${tag}
-        <span onclick="removeTag(${i});event.stopImmediatePropagation()" class="ml-2 cursor-pointer text-xs">✕</span>
-      </span>`).join('');
+      <span class="inline-flex items-center bg-[#3b82f6] text-white text-sm px-4 py-1 rounded-3xl">#${tag}<span onclick="removeTag(${i});event.stopImmediatePropagation()" class="ml-2 cursor-pointer text-xs">✕</span></span>`).join('');
   }
 
   window.removeTag = function(i) {
@@ -449,15 +344,8 @@
     const id = Date.now();
     container.innerHTML += `
       <div id="ex-${id}" class="flex gap-3 items-start bg-[#1f2937] rounded-2xl p-3">
-        <div class="flex-1">
-          <div class="blue-label mb-1">用户:</div>
-          <input id="user-ex-${id}" placeholder="用户说..." class="w-full bg-[#374151] rounded-2xl px-4 py-3 text-sm">
-        </div>
-        <div class="flex-1">
-          <div class="blue-label mb-1">角色:</div>
-          <input id="role-ex-${id}" placeholder="角色说..." class="w-full bg-[#374151] rounded-2xl px-4 py-3 text-sm">
-          <button onclick="removeExample(${id})" class="text-red-400 text-xs mt-1">删除此示例</button>
-        </div>
+        <div class="flex-1"><div class="blue-label mb-1">用户:</div><input id="user-ex-${id}" placeholder="用户说..." class="w-full bg-[#374151] rounded-2xl px-4 py-3 text-sm"></div>
+        <div class="flex-1"><div class="blue-label mb-1">角色:</div><input id="role-ex-${id}" placeholder="角色说..." class="w-full bg-[#374151] rounded-2xl px-4 py-3 text-sm"><button onclick="removeExample(${id})" class="text-red-400 text-xs mt-1">删除</button></div>
       </div>`;
   }
 
@@ -467,28 +355,20 @@
   };
 
   function toggleAdvanced() {
-    const prompt = document.getElementById('systemPrompt');
-    prompt.classList.toggle('hidden');
+    document.getElementById('systemPrompt').classList.toggle('hidden');
   }
 
   async function saveCard() {
     const name = document.getElementById('cardName').value.trim();
     if (!name) return alert("AI角色名不能为空！");
-
-    // 收集示例对话
     currentExampleDialogs = [];
     document.querySelectorAll('#exampleDialogs > div').forEach(div => {
-      const userInput = document.getElementById(`user-ex-${div.id.split('-')[1]}`);
-      const roleInput = document.getElementById(`role-ex-${div.id.split('-')[1]}`);
-      const userText = userInput ? userInput.value.trim() : '';
-      const roleText = roleInput ? roleInput.value.trim() : '';
-      if (userText && roleText) currentExampleDialogs.push({ user: userText, role: roleText });
+      const user = document.getElementById(`user-ex-${div.id.split('-')[1]}`)?.value.trim() || '';
+      const role = document.getElementById(`role-ex-${div.id.split('-')[1]}`)?.value.trim() || '';
+      if (user && role) currentExampleDialogs.push({ user, role });
     });
-
     const payload = {
-      owner_id: userId,
-      name: name,
-      tags: currentTags,
+      owner_id: userId, name: name, tags: currentTags,
       gender: document.getElementById('gender').value,
       age: document.getElementById('age').value,
       personality: document.getElementById('personality').value,
@@ -499,17 +379,14 @@
       example_dialog: currentExampleDialogs,
       system_prompt: document.getElementById('systemPrompt').value || null
     };
-
     let error;
     if (currentEditId) {
       ({ error } = await supabaseClient.from('role_cards').update(payload).eq('id', currentEditId));
     } else {
       ({ error } = await supabaseClient.from('role_cards').insert(payload));
     }
-
-    if (error) {
-      alert("保存失败: " + error.message);
-    } else {
+    if (error) alert("保存失败: " + error.message);
+    else {
       alert(currentEditId ? "✅ 修改成功！" : "✅ 创建成功！");
       hideModal();
       loadRoles();
@@ -522,9 +399,7 @@
     currentEditId = id;
     currentTags = card.tags || [];
     currentExampleDialogs = card.example_dialog || [];
-
     document.getElementById('cardName').value = card.name || '';
-    document.getElementById('userRoleName').value = ''; // 用户角色名暂未存表，可后续扩展
     document.getElementById('nsfwToggle').checked = !!card.nsfw;
     document.getElementById('gender').value = card.gender || '';
     document.getElementById('age').value = card.age || '';
@@ -532,28 +407,17 @@
     document.getElementById('appearance').value = card.appearance || '';
     document.getElementById('kinks').value = card.kinks || '';
     document.getElementById('beginnerMode').checked = !!card.beginner_mode;
-
     renderChips();
-
-    // 渲染已有示例对话
     const container = document.getElementById('exampleDialogs');
     container.innerHTML = '';
     currentExampleDialogs.forEach((ex, idx) => {
       const id = Date.now() + idx;
       container.innerHTML += `
         <div id="ex-${id}" class="flex gap-3 items-start bg-[#1f2937] rounded-2xl p-3">
-          <div class="flex-1">
-            <div class="blue-label mb-1">用户:</div>
-            <input id="user-ex-${id}" value="${ex.user || ''}" class="w-full bg-[#374151] rounded-2xl px-4 py-3 text-sm">
-          </div>
-          <div class="flex-1">
-            <div class="blue-label mb-1">角色:</div>
-            <input id="role-ex-${id}" value="${ex.role || ''}" class="w-full bg-[#374151] rounded-2xl px-4 py-3 text-sm">
-            <button onclick="removeExample(${id})" class="text-red-400 text-xs mt-1">删除此示例</button>
-          </div>
+          <div class="flex-1"><div class="blue-label mb-1">用户:</div><input id="user-ex-${id}" value="${ex.user||''}" class="w-full bg-[#374151] rounded-2xl px-4 py-3 text-sm"></div>
+          <div class="flex-1"><div class="blue-label mb-1">角色:</div><input id="role-ex-${id}" value="${ex.role||''}" class="w-full bg-[#374151] rounded-2xl px-4 py-3 text-sm"><button onclick="removeExample(${id})" class="text-red-400 text-xs mt-1">删除</button></div>
         </div>`;
     });
-
     showModal(true);
   }
 
@@ -569,32 +433,21 @@
     }
   }
 
-  // ====================== 赚钻石 Tab ======================
-  function fakeLottery() {
-    alert("🎉 恭喜！你抽中了 50 钻石！（演示）\n\n真实抽奖功能后面再加～");
-  }
+  function fakeLottery() { alert("🎉 恭喜！你抽中了 50 钻石！（演示）"); }
 
-  // ====================== 我的 Tab ======================
   function loadProfile() {
     document.getElementById('userAvatar').src = userPhoto;
     document.getElementById('userName').textContent = userName;
-    document.getElementById('diamondCount').textContent = "128"; // 后续可从 Supabase 读取
-
+    document.getElementById('diamondCount').textContent = "128";
     document.getElementById('cardCount').textContent = allCards.length;
     const list = document.getElementById('myCardsList');
-    list.innerHTML = allCards.length ? 
-      allCards.map(c => `
-        <div class="bg-[#2a0044] rounded-2xl p-4 flex justify-between items-center">
-          <div>
-            <div class="font-medium">${c.name}</div>
-            ${c.gender ? `<div class="text-xs text-blue-400">性别：${c.gender}</div>` : ''}
-          </div>
-          <div class="text-[#a855f7] text-sm">${c.tags ? c.tags.join(' ') : ''}</div>
-        </div>`).join('') : 
-      '<div class="text-white/50 text-center py-8">还没有卡片哦～快去创建吧！</div>';
+    list.innerHTML = allCards.length ? allCards.map(c => `
+      <div class="bg-[#2a0044] rounded-2xl p-4 flex justify-between items-center">
+        <div><div class="font-medium">${c.name}</div>${c.gender ? `<div class="text-xs text-blue-400">性别：${c.gender}</div>` : ''}</div>
+        <div class="text-[#a855f7] text-sm">${c.tags ? c.tags.join(' ') : ''}</div>
+      </div>`).join('') : '<div class="text-white/50 text-center py-8">还没有卡片哦～快去创建吧！</div>';
   }
 
-  // ====================== 设置功能 ======================
   async function clearAllData() {
     if (!confirm("⚠️ 确定要清除你**所有**人物卡吗？此操作不可恢复！")) return;
     const { error } = await supabaseClient.from('role_cards').delete().eq('owner_id', userId);
@@ -606,20 +459,12 @@
     }
   }
 
-  function showAbout() {
-    alert("DND AI 助手 v1.0\n\n由 xAI Grok + Supabase + Vercel + Railway 驱动\n\n欢迎随时反馈新功能～");
-  }
+  function showAbout() { alert("DND AI 助手 v1.0\n\n标签搜索已优化～"); }
+  function logout() { if (confirm("退出登录？重新打开 Telegram WebApp 即可重新登录。")) tg.close(); }
 
-  function logout() {
-    if (confirm("退出登录？重新打开 Telegram WebApp 即可重新登录。")) {
-      tg.close();
-    }
-  }
-
-  // ====================== 页面初始化 ======================
   window.onload = () => {
-    loadRoles();      // 加载所有人物卡
-    switchTab(1);     // 默认打开「人物卡」
+    loadRoles();
+    switchTab(1);
   };
 </script>
 </body>
