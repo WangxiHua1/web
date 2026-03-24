@@ -14,7 +14,7 @@
     .tab-active { color: #a855f7; border-top: 3px solid #a855f7; }
     .modal-content { max-height: 90vh; overflow-y: auto; }
     .chat-bubble { max-width: 75%; padding: 12px 18px; border-radius: 20px; }
-    .avatar { width: 64px; height: 64px; border-radius: 9999px; object-fit: cover; border: 3px solid #a855f7; }
+    .avatar { width: 80px; height: 80px; border-radius: 9999px; object-fit: cover; border: 4px solid #a855f7; }
     .blue-label { background: #3b82f6; color: white; padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; }
   </style>
 </head>
@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <!-- 人物卡 Tab（标签搜索已优化） -->
+    <!-- 人物卡 Tab -->
     <div id="tab-cards" class="tab-content hidden">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-3xl font-bold">人物卡</h2>
@@ -64,42 +64,39 @@
       <div class="bg-[#2a0044] rounded-3xl p-10">
         <p class="text-7xl mb-6">💎</p>
         <p class="text-xl mb-8">当前页面暂时为空</p>
-        <p class="text-white/70 mb-10">后面可以在这里放抽奖、签到、任务等赚钻石功能～</p>
-        <button onclick="fakeLottery()" class="bg-[#a855f7] hover:bg-[#9333ea] px-10 py-4 rounded-2xl font-bold text-xl active:scale-95 transition">🎟️ 立即抽奖（演示）</button>
+        <p class="text-white/70 mb-10">占位符</p>
+        <button onclick="fakeLottery()" class="bg-[#a855f7] hover:bg-[#9333ea] px-10 py-4 rounded-2xl font-bold text-xl active:scale-95 transition">🎟️ 彩票？</button>
       </div>
     </div>
 
     <!-- 我的 Tab -->
     <div id="tab-profile" class="tab-content hidden">
       <h2 class="text-3xl font-bold mb-6">我的</h2>
-      <div class="bg-[#2a0044] rounded-3xl p-6 mb-8 flex items-center gap-4">
-        <img id="userAvatar" src="https://via.placeholder.com/64/a855f7/ffffff?text=👤" alt="头像" class="avatar">
-        <div class="flex-1">
-          <div id="userName" class="font-bold text-2xl"></div>
-          <div class="text-white/60 text-sm">Telegram 用户</div>
+      <div class="bg-[#2a0044] rounded-3xl p-6 mb-8">
+        <div class="flex flex-col items-center mb-6">
+          <img id="userAvatar" src="https://via.placeholder.com/80/a855f7/ffffff?text=👤" alt="头像" class="avatar mb-4 cursor-pointer" onclick="document.getElementById('avatarUpload').click()">
+          <input type="file" id="avatarUpload" accept="image/*" class="hidden" onchange="uploadAvatar(event)">
+          <button onclick="document.getElementById('avatarUpload').click()" class="text-xs bg-white/10 hover:bg-white/20 px-6 py-2 rounded-3xl">更换头像</button>
         </div>
-        <div class="text-right">
-          <div class="text-white/60 text-sm">钻石</div>
-          <div id="diamondCount" class="text-5xl font-bold text-[#a855f7]">128</div>
+        <div class="mb-6">
+          <div class="text-white/70 text-sm mb-2">自定义名字</div>
+          <div class="flex gap-3">
+            <input id="customNameInput" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg" placeholder="输入你的名字">
+            <button onclick="saveProfile()" class="bg-[#a855f7] px-8 rounded-2xl font-bold">保存</button>
+          </div>
+        </div>
+        <div class="flex justify-between items-center bg-[#1a0033] rounded-3xl p-6">
+          <div>
+            <div class="text-white/60 text-sm">钻石余额</div>
+            <div id="diamondCount" class="text-6xl font-bold text-[#a855f7]">000</div>
+          </div>
+          <div class="text-7xl">💎</div>
         </div>
       </div>
       <div class="mb-4 flex justify-between items-center">
         <div class="text-white/60">我创建的人物卡（<span id="cardCount">0</span> 张）</div>
       </div>
       <div id="myCardsList" class="space-y-3 mb-10"></div>
-      <div class="bg-[#2a0044] rounded-3xl p-6">
-        <div class="text-lg font-bold mb-4">设置</div>
-        <div onclick="clearAllData()" class="flex items-center justify-between py-4 border-b border-white/10 cursor-pointer hover:bg-white/5 px-2 rounded-2xl">
-          <div class="flex items-center gap-3"><span class="text-2xl">🗑️</span><div>清除所有人物卡</div></div>
-          <span class="text-red-400 text-sm">危险操作</span>
-        </div>
-        <div onclick="showAbout()" class="flex items-center justify-between py-4 border-b border-white/10 cursor-pointer hover:bg-white/5 px-2 rounded-2xl">
-          <div class="flex items-center gap-3"><span class="text-2xl">ℹ️</span><div>关于 DND AI 助手</div></div>
-        </div>
-        <div onclick="logout()" class="flex items-center justify-between py-4 cursor-pointer hover:bg-white/5 px-2 rounded-2xl">
-          <div class="flex items-center gap-3"><span class="text-2xl">🚪</span><div>退出登录</div></div>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -113,55 +110,47 @@
     </div>
   </div>
 
-  <!-- 专业人物卡弹窗 -->
+  <!-- 人物卡弹窗 -->
   <div id="modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4" onclick="if(event.target.id==='modal') hideModal()">
     <div class="modal-content bg-[#1f2937] w-full max-w-lg mx-auto rounded-3xl p-6" onclick="event.stopImmediatePropagation()">
       <div class="flex justify-between items-center mb-6">
         <h2 id="modalTitle" class="text-2xl font-bold">AI角色名（必填）</h2>
         <button onclick="hideModal()" class="text-white/60 text-3xl leading-none">×</button>
       </div>
-      <input id="cardName" placeholder="AI扮演的角色名字" class="w-full bg-[#374151] rounded-2xl px-5 py-4 text-lg mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <input id="cardName" placeholder="AI扮演的角色名字" oninput="updateTokenCount()" class="w-full bg-[#374151] rounded-2xl px-5 py-4 text-lg mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500">
       <div class="mb-6">
         <div class="text-white/70 text-sm mb-2">用户角色名（非必填）</div>
-        <input id="userRoleName" placeholder="不会在聊天中显示，但可帮AI更好生成对话内容" class="w-full bg-[#374151] rounded-2xl px-5 py-4 text-lg">
+        <input id="userRoleName" placeholder="不会在聊天中显示，但可帮AI更好生成对话内容" oninput="updateTokenCount()" class="w-full bg-[#374151] rounded-2xl px-5 py-4 text-lg">
       </div>
       <div class="flex items-center gap-3 mb-6">
         <label class="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" id="nsfwToggle" class="w-5 h-5 accent-blue-500">
+          <input type="checkbox" id="nsfwToggle" onclick="toggleKinksVisibility(); updateTokenCount()">
           <span class="text-lg font-medium">NSFW</span>
         </label>
       </div>
       <div class="space-y-5">
-        <div class="flex items-center gap-3"><div class="blue-label">性别:</div><select id="gender" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg"><option value="">选择</option><option value="女">女</option><option value="男">男</option><option value="其他">其他</option></select></div>
-        <div class="flex items-center gap-3"><div class="blue-label">年龄:</div><input id="age" placeholder="18（示例，最小18岁）" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg"></div>
-        <div class="flex items-center gap-3"><div class="blue-label">性格:</div><input id="personality" placeholder="性格" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg"></div>
-        <div class="flex items-center gap-3"><div class="blue-label">外貌:</div><textarea id="appearance" rows="2" placeholder="身高165cm, 长相甜美, 高中校服JK款（示例）" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea></div>
-        <div class="flex items-center gap-3"><div class="blue-label">性癖:</div><input id="kinks" placeholder="异味癖，对拒绝敏感（示例，可多个）" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg"></div>
+        <div class="flex items-center gap-3"><div class="blue-label">性别:</div><select id="gender" onchange="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg"><option value="">选择</option><option value="女">女</option><option value="男">男</option><option value="其他">其他</option></select></div>
+        <!-- 年龄字段：强制最低 18 岁 -->
+        <div class="flex items-center gap-3">
+          <div class="blue-label">年龄:</div>
+          <input id="age" type="number" min="18" placeholder="18" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
+        </div>
+        <div class="flex items-center gap-3"><div class="blue-label">性格:</div><input id="personality" placeholder="性格" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg"></div>
+        <div class="flex items-center gap-3"><div class="blue-label">外貌:</div><textarea id="appearance" rows="2" placeholder="身高165cm, 长相甜美, 高中校服JK款（示例）" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea></div>
+        <div id="kinksSection" class="flex items-center gap-3 hidden">
+          <div class="blue-label">性癖:</div>
+          <input id="kinks" placeholder="异味癖，对拒绝敏感（示例，可多个）" oninput="updateTokenCount()" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4 text-lg">
+        </div>
       </div>
       <div class="mt-6 mb-6">
         <div class="flex gap-2 mb-2">
-          <input id="tagInput" placeholder="输入标签后回车或点击添加" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4" onkeydown="if(event.key==='Enter') addTag()">
+          <input id="tagInput" placeholder="输入标签后回车或点击添加" class="flex-1 bg-[#374151] rounded-2xl px-5 py-4">
           <button onclick="addTag()" class="bg-blue-500 px-6 rounded-2xl font-bold">添加</button>
         </div>
         <div id="tagChips" class="flex flex-wrap gap-2"></div>
       </div>
-      <div class="flex items-center gap-2 mb-6">
-        <input type="checkbox" id="beginnerMode" class="w-5 h-5 accent-blue-500">
-        <span class="text-white/80">开启新手模式</span>
-      </div>
-      <div class="mb-6">
-        <div class="flex justify-between items-center mb-3">
-          <div class="text-white/70">对话示例</div>
-          <button onclick="addExampleDialog()" class="text-blue-400 text-sm">+ 添加示例</button>
-        </div>
-        <div id="exampleDialogs" class="space-y-3 bg-[#374151] rounded-3xl p-4"></div>
-      </div>
-      <div class="mb-6">
-        <div onclick="toggleAdvanced()" class="flex items-center justify-between cursor-pointer py-2">
-          <span class="text-white/70">切换高级模式</span>
-          <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="advancedToggle" class="sr-only peer"><div class="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:bg-blue-500"></div></label>
-        </div>
-        <textarea id="systemPrompt" rows="4" placeholder="完整系统提示词（可选）" class="hidden w-full mt-3 bg-[#374151] rounded-2xl px-5 py-4 resize-none"></textarea>
+      <div id="tokenDisplay" class="text-xs text-white/60 flex justify-end mt-4">
+        总消耗: <span id="tokenCount" class="font-mono text-[#a855f7] ml-1">000</span> tokens
       </div>
       <div class="flex gap-3 mt-8">
         <button onclick="hideModal()" class="flex-1 py-4 rounded-2xl border border-white/30 text-white/80">取消</button>
@@ -172,10 +161,9 @@
   </div>
 
 <script>
-  const tg = window.Telegram.WebApp; tg.ready(); tg.expand(); tg.setHeaderColor("#1a0033"); tg.setBackgroundColor("#1a0033");
+  const tg = window.Telegram.WebApp;
+  tg.ready(); tg.expand(); tg.setHeaderColor("#1a0033"); tg.setBackgroundColor("#1a0033");
   const userId = tg.initDataUnsafe?.user?.id || 123456;
-  const userName = tg.initDataUnsafe?.user?.username || tg.initDataUnsafe?.user?.first_name || "玩家";
-  const userPhoto = tg.initDataUnsafe?.user?.photo_url || "https://via.placeholder.com/64/a855f7/ffffff?text=👤";
   const SUPABASE_URL = "https://pttzjqrdsgjygglkhvot.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C";
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -185,16 +173,42 @@
   let currentEditId = null;
   let selectedFilterTags = [];
   let currentTags = [];
-  let currentExampleDialogs = [];
+
+  function estimateTokens(text) {
+    if (!text) return 0;
+    let chinese = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
+    let other = text.length - chinese;
+    return Math.ceil(chinese + other / 4);
+  }
+
+  function updateTokenCount() {
+    let total = 0;
+    total += estimateTokens(document.getElementById('cardName').value);
+    total += estimateTokens(document.getElementById('userRoleName').value);
+    total += estimateTokens(document.getElementById('personality').value);
+    total += estimateTokens(document.getElementById('appearance').value);
+    if (!document.getElementById('kinksSection').classList.contains('hidden')) {
+      total += estimateTokens(document.getElementById('kinks').value);
+    }
+    total += currentTags.length * 8;
+    total += 120;
+    document.getElementById('tokenCount').textContent = total;
+  }
+
+  function toggleKinksVisibility() {
+    const nsfwChecked = document.getElementById('nsfwToggle').checked;
+    document.getElementById('kinksSection').classList.toggle('hidden', !nsfwChecked);
+    updateTokenCount();
+  }
 
   function switchTab(n) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
     const tabs = ['tab-chat','tab-cards','tab-diamonds','tab-profile'];
     document.getElementById(tabs[n]).classList.remove('hidden');
-    document.querySelectorAll('.tab-btn').forEach((btn,i)=>btn.classList.toggle('tab-active',i===n));
-    if(n===0) loadChatCards();
-    if(n===1) loadRoles();
-    if(n===3) loadProfile();
+    document.querySelectorAll('.tab-btn').forEach((btn,i) => btn.classList.toggle('tab-active', i===n));
+    if (n === 0) loadChatCards();
+    if (n === 1) loadRoles();
+    if (n === 3) loadProfile();
   }
 
   async function loadRoles() {
@@ -307,11 +321,10 @@
     document.getElementById('deleteBtn').classList.toggle('hidden', !isEdit);
     document.getElementById('saveBtn').textContent = isEdit ? '保存修改' : '提交';
     currentTags = [];
-    currentExampleDialogs = [];
     document.getElementById('tagChips').innerHTML = '';
-    document.getElementById('exampleDialogs').innerHTML = '';
-    document.getElementById('advancedToggle').checked = false;
-    document.getElementById('systemPrompt').classList.add('hidden');
+    document.getElementById('nsfwToggle').checked = false;
+    document.getElementById('kinksSection').classList.add('hidden');
+    updateTokenCount();
   }
 
   function hideModal() {
@@ -326,6 +339,7 @@
     currentTags.push(val);
     renderChips();
     input.value = '';
+    updateTokenCount();
   }
 
   function renderChips() {
@@ -337,47 +351,22 @@
   window.removeTag = function(i) {
     currentTags.splice(i, 1);
     renderChips();
+    updateTokenCount();
   };
-
-  function addExampleDialog() {
-    const container = document.getElementById('exampleDialogs');
-    const id = Date.now();
-    container.innerHTML += `
-      <div id="ex-${id}" class="flex gap-3 items-start bg-[#1f2937] rounded-2xl p-3">
-        <div class="flex-1"><div class="blue-label mb-1">用户:</div><input id="user-ex-${id}" placeholder="用户说..." class="w-full bg-[#374151] rounded-2xl px-4 py-3 text-sm"></div>
-        <div class="flex-1"><div class="blue-label mb-1">角色:</div><input id="role-ex-${id}" placeholder="角色说..." class="w-full bg-[#374151] rounded-2xl px-4 py-3 text-sm"><button onclick="removeExample(${id})" class="text-red-400 text-xs mt-1">删除</button></div>
-      </div>`;
-  }
-
-  window.removeExample = function(id) {
-    const el = document.getElementById(`ex-${id}`);
-    if (el) el.remove();
-  };
-
-  function toggleAdvanced() {
-    document.getElementById('systemPrompt').classList.toggle('hidden');
-  }
 
   async function saveCard() {
     const name = document.getElementById('cardName').value.trim();
     if (!name) return alert("AI角色名不能为空！");
-    currentExampleDialogs = [];
-    document.querySelectorAll('#exampleDialogs > div').forEach(div => {
-      const user = document.getElementById(`user-ex-${div.id.split('-')[1]}`)?.value.trim() || '';
-      const role = document.getElementById(`role-ex-${div.id.split('-')[1]}`)?.value.trim() || '';
-      if (user && role) currentExampleDialogs.push({ user, role });
-    });
     const payload = {
-      owner_id: userId, name: name, tags: currentTags,
+      owner_id: userId,
+      name: name,
+      tags: currentTags,
       gender: document.getElementById('gender').value,
       age: document.getElementById('age').value,
       personality: document.getElementById('personality').value,
       appearance: document.getElementById('appearance').value,
-      kinks: document.getElementById('kinks').value,
-      nsfw: document.getElementById('nsfwToggle').checked,
-      beginner_mode: document.getElementById('beginnerMode').checked,
-      example_dialog: currentExampleDialogs,
-      system_prompt: document.getElementById('systemPrompt').value || null
+      kinks: document.getElementById('nsfwToggle').checked ? document.getElementById('kinks').value : null,
+      nsfw: document.getElementById('nsfwToggle').checked
     };
     let error;
     if (currentEditId) {
@@ -398,27 +387,18 @@
     if (!card) return;
     currentEditId = id;
     currentTags = card.tags || [];
-    currentExampleDialogs = card.example_dialog || [];
     document.getElementById('cardName').value = card.name || '';
+    document.getElementById('userRoleName').value = '';
     document.getElementById('nsfwToggle').checked = !!card.nsfw;
     document.getElementById('gender').value = card.gender || '';
     document.getElementById('age').value = card.age || '';
     document.getElementById('personality').value = card.personality || '';
     document.getElementById('appearance').value = card.appearance || '';
     document.getElementById('kinks').value = card.kinks || '';
-    document.getElementById('beginnerMode').checked = !!card.beginner_mode;
+    document.getElementById('kinksSection').classList.toggle('hidden', !card.nsfw);
     renderChips();
-    const container = document.getElementById('exampleDialogs');
-    container.innerHTML = '';
-    currentExampleDialogs.forEach((ex, idx) => {
-      const id = Date.now() + idx;
-      container.innerHTML += `
-        <div id="ex-${id}" class="flex gap-3 items-start bg-[#1f2937] rounded-2xl p-3">
-          <div class="flex-1"><div class="blue-label mb-1">用户:</div><input id="user-ex-${id}" value="${ex.user||''}" class="w-full bg-[#374151] rounded-2xl px-4 py-3 text-sm"></div>
-          <div class="flex-1"><div class="blue-label mb-1">角色:</div><input id="role-ex-${id}" value="${ex.role||''}" class="w-full bg-[#374151] rounded-2xl px-4 py-3 text-sm"><button onclick="removeExample(${id})" class="text-red-400 text-xs mt-1">删除</button></div>
-        </div>`;
-    });
     showModal(true);
+    updateTokenCount();
   }
 
   async function deleteCard() {
@@ -433,12 +413,26 @@
     }
   }
 
-  function fakeLottery() { alert("🎉 恭喜！你抽中了 50 钻石！（演示）"); }
+  function fakeLottery() {
+    alert("🎉 占位符");
+  }
 
-  function loadProfile() {
-    document.getElementById('userAvatar').src = userPhoto;
-    document.getElementById('userName').textContent = userName;
-    document.getElementById('diamondCount').textContent = "128";
+  async function loadProfile() {
+    const { data: profile } = await supabaseClient
+      .from('user_profiles')
+      .select('custom_name, diamonds, custom_avatar_url')
+      .eq('user_id', userId)
+      .single();
+
+    const name = profile?.custom_name || "玩家";
+    const diamonds = profile?.diamonds || 000;
+    const avatarUrl = profile?.custom_avatar_url || "https://via.placeholder.com/80/a855f7/ffffff?text=👤";
+
+    document.getElementById('userName').textContent = name;
+    document.getElementById('customNameInput').value = name;
+    document.getElementById('diamondCount').textContent = diamonds;
+    document.getElementById('userAvatar').src = avatarUrl;
+
     document.getElementById('cardCount').textContent = allCards.length;
     const list = document.getElementById('myCardsList');
     list.innerHTML = allCards.length ? allCards.map(c => `
@@ -448,19 +442,22 @@
       </div>`).join('') : '<div class="text-white/50 text-center py-8">还没有卡片哦～快去创建吧！</div>';
   }
 
-  async function clearAllData() {
-    if (!confirm("⚠️ 确定要清除你**所有**人物卡吗？此操作不可恢复！")) return;
-    const { error } = await supabaseClient.from('role_cards').delete().eq('owner_id', userId);
-    if (error) alert("清除失败");
+  async function saveProfile() {
+    const newName = document.getElementById('customNameInput').value.trim() || "玩家";
+    const { error } = await supabaseClient
+      .from('user_profiles')
+      .update({ custom_name: newName })
+      .eq('user_id', userId);
+    if (error) alert("保存失败");
     else {
-      alert("✅ 已清除所有人物卡");
-      loadRoles();
-      switchTab(3);
+      alert("✅ 名字已保存");
+      loadProfile();
     }
   }
 
-  function showAbout() { alert("DND AI 助手 v1.0\n\n标签搜索已优化～"); }
-  function logout() { if (confirm("退出登录？重新打开 Telegram WebApp 即可重新登录。")) tg.close(); }
+  async function uploadAvatar(e) {
+    alert("头像上传功能目前仅演示");
+  }
 
   window.onload = () => {
     loadRoles();
