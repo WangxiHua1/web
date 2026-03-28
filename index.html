@@ -295,10 +295,31 @@
 
     <!-- 完整 JS（supabase 只声明一次，所有函数全部定义） -->
     <script>
-                // Supabase 配置 + 降级保护（修复点击无反应）
+                // Supabase 配置
         const supabaseUrl = 'https://pttzjqrdsgjygglkhvot.supabase.co';
         const supabaseKey = 'sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C';
         let supabase = null;
+        
+        // 全局变量
+        let roleCards = [];
+        let myRoleCards = [];
+        let currentUser = { telegram_id: 1782047744, diamonds: 4892, ai_level: 3 };
+        let currentTheme = 'dark';
+        let currentChatRole = null;
+        let chatHistory = [];
+        
+        function initSupabase() {
+            try {
+                const { createClient } = Supabase;
+                supabase = createClient(supabaseUrl, supabaseKey);
+                console.log('✅ Supabase 客户端初始化成功');
+                return true;
+            } catch (err) {
+                console.error('❌ Supabase 初始化失败:', err);
+                alert('Supabase 初始化失败，请检查 anon key 是否正确');
+                return false;
+            }
+        }
 
         // ==================== 工具函数 ====================
         function updateRealTimeClock() {
@@ -315,39 +336,46 @@
             document.getElementById('theme-text').textContent = currentTheme === 'dark' ? '浅色' : '深色';
         }
 
-        // 全局变量
-        let roleCards = [];
-        let myRoleCards = [];
-        let currentUser = { telegram_id: 1782047744, diamonds: 4892, ai_level: 3 };
-        let currentTheme = 'dark';
-        let currentChatRole = null;
-        let chatHistory = [];
-
-
-
         // ==================== Supabase 加载角色 ====================
-                // ==================== Supabase 加载角色（已改成假数据 + 降级） ====================
         async function loadRolesFromSupabase() {
-            // 临时假数据（立即显示可点击的角色卡）
-            roleCards = [
-                {
-                    id: 1, name: "温柔学姐", play_type: "养成", nsfw: false,
-                    description: "温柔体贴的大学学姐，喜欢照顾你～", tags: "温柔,日常,养成",
-                    avatar: "https://picsum.photos/id/1011/800/600", favorability: 85, ai_level: 3
-                },
-                {
-                    id: 2, name: "傲娇女仆", play_type: "剧本", nsfw: true,
-                    description: "表面高冷其实很粘人的女仆", tags: "傲娇,女仆,NSFW",
-                    avatar: "https://picsum.photos/id/201/800/600", favorability: 42, ai_level: 4
-                },
-                {
-                    id: 3, name: "AI 猫娘", play_type: "养成", nsfw: false,
-                    description: "会喵喵叫的智能猫娘", tags: "猫娘,可爱,养成",
-                    avatar: "https://picsum.photos/id/1005/800/600", favorability: 95, ai_level: 5
-                }
-            ];
+            if (!supabase) {
+                const success = initSupabase();
+                if (!success) return;
+            }
+
+            console.log('🔄 正在从 Supabase 加载角色...');
+
+            const { data, error } = await supabase
+                .from('role_cards')
+                .select('*')
+                .order('id', { ascending: true });
+
+            if (error) {
+                console.error('❌ 加载失败:', error);
+                alert('Supabase 加载失败\n已自动显示测试角色');
+                // 假数据降级
+                roleCards = [
+                    { id: 1, name: "温柔学姐", play_type: "养成", nsfw: false, description: "温柔体贴的大学学姐～", tags: "温柔,日常", avatar: "https://picsum.photos/id/1011/800/600", favorability: 85, ai_level: 3 },
+                    { id: 2, name: "傲娇女仆", play_type: "剧本", nsfw: true, description: "表面高冷其实很粘人", tags: "傲娇,NSFW", avatar: "https://picsum.photos/id/201/800/600", favorability: 42, ai_level: 4 }
+                ];
+                renderRoleList(roleCards);
+                return;
+            }
+
+            roleCards = data.map(r => ({
+                id: r.id,
+                name: r.name || '未命名角色',
+                play_type: r.play_type || '养成',
+                nsfw: r.nsfw || false,
+                description: r.personality || r.system_prompt || '这是一个神秘角色～',
+                tags: Array.isArray(r.tags) ? r.tags.join(', ') : (r.tags || ''),
+                avatar: `https://picsum.photos/id/${(r.id % 100) + 100}/800/600`,
+                favorability: r.favorability || 0,
+                ai_level: r.ai_level || 3
+            }));
+
+            console.log(`✅ 成功加载 ${roleCards.length} 个角色`);
             renderRoleList(roleCards);
-            console.log('✅ 已使用本地假数据（Supabase 跳过）');
         }
 
         function renderRoleList(filteredRoles) {
@@ -587,9 +615,10 @@
         function initializeApp() {
             updateRealTimeClock();
             setInterval(updateRealTimeClock, 60000);
+            initSupabase();
+            
             loadRolesFromSupabase();
             updateDiamondUI();
-            console.log('✅ 完整AI陪聊系统初始化完成（所有功能已实现，无任何省略）');
         }
         
         window.onload = initializeApp;
