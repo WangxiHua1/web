@@ -346,11 +346,10 @@
 
         // 全局变量
         let roleCards = [];
-        let myRoleCards = [];
-        let chatHistory = [];
-        let currentChatRole = null;
-        let currentUser = { telegram_id: 1782047744, diamonds: 4892, ai_level: 3 };
+        let currentUser = {};
         let currentTheme = 'dark';
+        let currentChatRole = null;
+        let chatHistory = [];
 
         // ==================== 原有工具函数（完全保留） ====================
         function updateRealTimeClock() {
@@ -385,43 +384,27 @@
             renderRoleList(roleCards);
         }
 
-        function renderRoleList(filteredRoles) {
+        function renderRoleList(filtered) {
             const container = document.getElementById('role-list');
-            container.innerHTML = '';
-            filteredRoles.forEach(role => {
-                const cardHTML = `
-                <div onclick="openChat(${role.id})" class="role-card bg-gray-800 rounded-3xl overflow-hidden cursor-pointer shadow-lg">
-                    <div class="relative">
-                        <img src="${role.avatar}" class="w-full h-64 object-cover">
-                        ${role.nsfw ? `<div class="absolute top-3 left-3 bg-orange-500 text-white text-xs px-3 py-1 rounded-2xl">NSFW</div>` : ''}
-                        <div class="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-4 py-1 rounded-3xl">${role.play_type}</div>
-                        <div class="absolute bottom-3 right-3 bg-black/70 text-white text-[10px] px-3 py-0.5 rounded-3xl">Lv.${role.ai_level}</div>
-                    </div>
+            container.innerHTML = filtered.map(role => `
+                <div onclick="openChat(${role.id})" class="bg-gray-800 rounded-3xl overflow-hidden cursor-pointer">
+                    <img src="${role.avatar}" class="w-full h-64 object-cover">
                     <div class="p-4">
-                        <div class="font-semibold text-lg">${role.name}</div>
-                        <p class="text-sm text-gray-400 line-clamp-3 mt-1">${role.description}</p>
-                        <div class="flex items-center justify-between mt-4 text-xs">
-                            <div class="flex items-center gap-1 text-pink-500"><i class="fa-solid fa-heart"></i><span>${role.favorability}</span></div>
-                            <div class="text-gray-400">${role.tags}</div>
-                        </div>
+                        <div class="flex justify-between"><span class="font-bold">${role.name}</span><span class="text-xs bg-gray-700 px-3 py-1 rounded-3xl">Lv.${role.ai_level}</span></div>
+                        <p class="text-sm text-gray-400 line-clamp-3">${role.description}</p>
                     </div>
-                </div>`;
-                container.innerHTML += cardHTML;
-            });
-            if (filteredRoles.length === 0) {
-                container.innerHTML = `<div class="col-span-2 py-12 text-center text-gray-400">暂无角色</div>`;
-            }
+                </div>
+            `).join('');
         }
 
         // ==================== 过滤函数（保留） ====================
-        function filterByType(btn) {
+       function filterByType(btn) {
             const type = btn.dataset.type;
             document.querySelectorAll('.select-playtype').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             let filtered = roleCards;
             if (type !== 'all') {
-                if (type === 'NSFW') filtered = roleCards.filter(r => r.nsfw);
-                else filtered = roleCards.filter(r => r.play_type === type);
+                filtered = type === 'NSFW' ? roleCards.filter(r => r.nsfw) : roleCards.filter(r => r.play_type === type);
             }
             renderRoleList(filtered);
         }
@@ -597,8 +580,6 @@
             updateRealTimeClock();
             setInterval(updateRealTimeClock, 60000);
             loadRolesFromSupabase();
-            updateDiamondUI();
-            console.log('✅ 完整AI陪聊系统已集成（所有功能无一省略 + 页面保持你原本样子）');
         }
         
         window.onload = initializeApp;
