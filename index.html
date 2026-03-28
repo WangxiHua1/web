@@ -298,7 +298,8 @@
         // Supabase 配置（只在这里声明一次）
         const supabaseUrl = 'https://pttzjqrdsgjygglkhvot.supabase.co';
         const supabaseKey = 'sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C';
-        const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+        const { createClient } = Supabase;
+        const supabase = createClient(supabaseUrl, supabaseKey);
 
         // 全局变量
         let roleCards = [];
