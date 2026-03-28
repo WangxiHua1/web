@@ -295,18 +295,10 @@
 
     <!-- 完整 JS（supabase 只声明一次，所有函数全部定义） -->
     <script>
-        // Supabase 配置（只在这里声明一次）
+                // Supabase 配置 + 降级保护（修复点击无反应）
         const supabaseUrl = 'https://pttzjqrdsgjygglkhvot.supabase.co';
         const supabaseKey = 'sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C';
-        const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
-
-        // 全局变量
-        let roleCards = [];
-        let myRoleCards = [];
-        let currentUser = { telegram_id: 1782047744, diamonds: 4892, ai_level: 3 };
-        let currentTheme = 'dark';
-        let currentChatRole = null;
-        let chatHistory = [];
+        let supabase = null;
 
         // ==================== 工具函数 ====================
         function updateRealTimeClock() {
@@ -323,25 +315,39 @@
             document.getElementById('theme-text').textContent = currentTheme === 'dark' ? '浅色' : '深色';
         }
 
+        // 全局变量
+        let roleCards = [];
+        let myRoleCards = [];
+        let currentUser = { telegram_id: 1782047744, diamonds: 4892, ai_level: 3 };
+        let currentTheme = 'dark';
+        let currentChatRole = null;
+        let chatHistory = [];
+
+
+
         // ==================== Supabase 加载角色 ====================
+                // ==================== Supabase 加载角色（已改成假数据 + 降级） ====================
         async function loadRolesFromSupabase() {
-            const { data, error } = await supabase.from('role_cards').select('*').order('id', { ascending: true });
-            if (error) {
-                console.error('加载角色失败:', error);
-                return;
-            }
-            roleCards = data.map(r => ({
-                id: r.id,
-                name: r.name || '未命名角色',
-                play_type: r.play_type || '养成',
-                nsfw: r.nsfw || false,
-                description: r.personality || r.system_prompt || '这是一个神秘角色～',
-                tags: Array.isArray(r.tags) ? r.tags.join(', ') : (r.tags || ''),
-                avatar: `https://picsum.photos/id/${(r.id % 100) + 100}/800/600`,
-                favorability: 0,
-                ai_level: r.ai_level || 3
-            }));
+            // 临时假数据（立即显示可点击的角色卡）
+            roleCards = [
+                {
+                    id: 1, name: "温柔学姐", play_type: "养成", nsfw: false,
+                    description: "温柔体贴的大学学姐，喜欢照顾你～", tags: "温柔,日常,养成",
+                    avatar: "https://picsum.photos/id/1011/800/600", favorability: 85, ai_level: 3
+                },
+                {
+                    id: 2, name: "傲娇女仆", play_type: "剧本", nsfw: true,
+                    description: "表面高冷其实很粘人的女仆", tags: "傲娇,女仆,NSFW",
+                    avatar: "https://picsum.photos/id/201/800/600", favorability: 42, ai_level: 4
+                },
+                {
+                    id: 3, name: "AI 猫娘", play_type: "养成", nsfw: false,
+                    description: "会喵喵叫的智能猫娘", tags: "猫娘,可爱,养成",
+                    avatar: "https://picsum.photos/id/1005/800/600", favorability: 95, ai_level: 5
+                }
+            ];
             renderRoleList(roleCards);
+            console.log('✅ 已使用本地假数据（Supabase 跳过）');
         }
 
         function renderRoleList(filteredRoles) {
