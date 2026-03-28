@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AI 陪聊</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
@@ -149,11 +150,11 @@
                     
                     <!-- 筛选标签 -->
                     <div class="flex gap-2 overflow-x-auto pb-3 mb-4">
-                        <div onclick="filterByType(this)" data-type="all" class="select-playtype active px-5 py-1 bg-pink-600 text-white rounded-3xl text-sm whitespace-nowrap">全部</div>
-                        <div onclick="filterByType(this)" data-type="养成" class="select-playtype px-5 py-1 bg-gray-800 light:bg-gray-200 light:text-gray-900 rounded-3xl text-sm whitespace-nowrap">养成系统</div>
-                        <div onclick="filterByType(this)" data-type="剧本" class="select-playtype px-5 py-1 bg-gray-800 light:bg-gray-200 light:text-gray-900 rounded-3xl text-sm whitespace-nowrap">剧本系统</div>
-                        <div onclick="filterByType(this)" class="select-playtype px-5 py-1 bg-gray-800 light:bg-gray-200 light:text-gray-900 rounded-3xl text-sm whitespace-nowrap">NSFW</div>
-                    </div>
+                    <div onclick="filterByType(this)" data-type="all" class="select-playtype active px-5 py-1 bg-pink-600 text-white rounded-3xl text-sm whitespace-nowrap">全部</div>
+                    <div onclick="filterByType(this)" data-type="养成" class="select-playtype px-5 py-1 bg-gray-800 light:bg-gray-200 light:text-gray-900 rounded-3xl text-sm whitespace-nowrap">养成系统</div>
+                    <div onclick="filterByType(this)" data-type="剧本" class="select-playtype px-5 py-1 bg-gray-800 light:bg-gray-200 light:text-gray-900 rounded-3xl text-sm whitespace-nowrap">剧本系统</div>
+                    <div onclick="filterByType(this)" data-type="NSFW" class="select-playtype px-5 py-1 bg-gray-800 light:bg-gray-200 light:text-gray-900 rounded-3xl text-sm whitespace-nowrap">NSFW</div>
+</div>
                     
                     <!-- 角色卡列表 -->
                     <div id="role-list" class="px-4 grid grid-cols-2 gap-4 pb-8">
@@ -303,70 +304,76 @@
     </div>
 
     <script>
-        let currentTheme = 'light'; // 默认浅色（匹配新截图）
-        let roleCards = JSON.parse(localStorage.getItem('roleCards')) || [
-            {
-                id: 1, name: "Yuki", play_type: "养成", nsfw: true,
-                description: "身高165cm，长相甜美，穿着高中校服，性格害羞黏人",
-                tags: "妹妹,校园", avatar: "https://picsum.photos/id/1011/800/600",
-                favorability: 12
-            },
-            {
-                id: 2, name: "邻居太太", play_type: "剧本", nsfw: true,
-                description: "39岁人妻，成熟魅力，喜欢在日常互动中慢慢释放",
-                tags: "NSFW,成熟", avatar: "https://picsum.photos/id/1005/800/600",
-                favorability: 0
-            }
-        ];
-        function saveToLocal() { localStorage.setItem('roleCards', JSON.stringify(roleCards)); }
-        
-        // 切换深浅色主题
-        function toggleTheme() {
-            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-            const body = document.body;
-            if (currentTheme === 'light') {
-                body.classList.remove('dark');
-                document.getElementById('theme-icon').className = 'fa-solid fa-sun text-yellow-300';
-                document.getElementById('theme-text').innerHTML = '浅色';
+       let currentTheme = 'light'; // 默认浅色
+    let currentRole = null;
+    let roleCards = JSON.parse(localStorage.getItem('roleCards')) || [
+        {
+            id: 1, name: "Yuki", play_type: "养成", nsfw: true,
+            description: "身高165cm，长相甜美，穿着高中校服，性格害羞黏人",
+            tags: "妹妹,校园", avatar: "https://picsum.photos/id/1011/800/600",
+            favorability: 12
+        },
+        {
+            id: 2, name: "邻居太太", play_type: "剧本", nsfw: true,
+            description: "39岁人妻，成熟魅力，喜欢在日常互动中慢慢释放",
+            tags: "NSFW,成熟", avatar: "https://picsum.photos/id/1005/800/600",
+            favorability: 0
+        }
+    ];
+
+    function saveToLocal() {
+        localStorage.setItem('roleCards', JSON.stringify(roleCards));
+    }
+
+    // ==================== 修复后的过滤函数 ====================
+    function filterByType(btn) {
+        const type = btn.dataset.type;   // ← 改这里
+        document.querySelectorAll('.select-playtype').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        let filtered = roleCards;
+        if (type !== 'all') {
+            if (type === 'NSFW') {
+                filtered = roleCards.filter(r => r.nsfw);
             } else {
-                body.classList.add('dark');
-                document.getElementById('theme-icon').className = 'fa-solid fa-moon';
-                document.getElementById('theme-text').innerHTML = '深色';
+                filtered = roleCards.filter(r => r.play_type === type);
             }
         }
-        
-        // 渲染角色列表
-        function renderRoleList(filteredRoles) {
-            const container = document.getElementById('role-list');
-            container.innerHTML = '';
-            
-            filtered.forEach(role => {
-                const html = `
-                <div onclick="openChat(${role.id})" class="role-card rounded-3xl overflow-hidden cursor-pointer">
-                    <div class="relative">
-                        <img src="${role.avatar}" class="w-full h-64 object-cover rounded-t-3xl">
-                        ${role.nsfw ? `<div class="absolute top-3 left-3 bg-orange-500 text-white text-xs px-3 py-1 rounded-2xl">NSFW</div>` : ''}
-                        <div class="absolute top-3 right-3 ${role.play_type==='养成'?'bg-pink-500':'bg-purple-500'} text-white text-xs px-4 py-1 rounded-3xl">${role.play_type}</div>
-                    </div>
-                    <div class="p-4">
-                        <div class="font-semibold text-lg">${role.name}</div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-3 mt-1">${role.description}</p>
-                        <div class="flex items-center justify-between mt-4 text-xs">
-                            <div class="flex items-center gap-1 text-pink-500">
-                                <i class="fa-solid fa-heart"></i>
-                                <span>${role.favorability}</span>
-                            </div>
-                            <div class="text-gray-400">${role.tags}</div>
+        renderRoleList(filtered);
+    }
+
+    // ==================== 修复后的渲染函数 ====================
+    function renderRoleList(filteredRoles) {
+        const container = document.getElementById('role-list');
+        container.innerHTML = '';
+
+        filteredRoles.forEach(role => {   // ← 改成 filteredRoles
+            const html = `
+            <div onclick="openChat(${role.id})" class="role-card rounded-3xl overflow-hidden cursor-pointer shadow-lg">
+                <div class="relative">
+                    <img src="${role.avatar}" class="w-full h-64 object-cover rounded-t-3xl">
+                    ${role.nsfw ? `<div class="absolute top-3 left-3 bg-orange-500 text-white text-xs px-3 py-1 rounded-2xl">NSFW</div>` : ''}
+                    <div class="absolute top-3 right-3 ${role.play_type==='养成'?'bg-pink-500':'bg-purple-500'} text-white text-xs px-4 py-1 rounded-3xl">${role.play_type}</div>
+                </div>
+                <div class="p-4">
+                    <div class="font-semibold text-lg">${role.name}</div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-3 mt-1">${role.description}</p>
+                    <div class="flex items-center justify-between mt-4 text-xs">
+                        <div class="flex items-center gap-1 text-pink-500">
+                            <i class="fa-solid fa-heart"></i>
+                            <span>${role.favorability}</span>
                         </div>
+                        <div class="text-gray-400">${role.tags}</div>
                     </div>
-                </div>`;
-                container.innerHTML += html;
-            });
-            
-            if (filtered.length === 0) {
-                container.innerHTML = `<div class="col-span-2 py-12 text-center text-gray-400">暂无角色</div>`;
-            }
+                </div>
+            </div>`;
+            container.innerHTML += html;
+        });
+
+        if (filteredRoles.length === 0) {
+            container.innerHTML = `<div class="col-span-2 py-12 text-center text-gray-400">暂无角色</div>`;
         }
+    }
      // ==================== 实时时间更新 ====================
     function updateRealTimeClock() {
         const timeEl = document.getElementById('time');
@@ -527,18 +534,283 @@
         
         // 初始化
         function initializeApp() {
-            updateRealTimeClock();
-            
-            setInterval(() => {
-                const now = new Date();
-                document.getElementById('time').textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-            }, 60000);
-            
-            // 渲染初始角色列表
+                // ==================== Supabase 配置（已接入你提供的项目） ====================
+    const supabaseUrl = 'https://pttzjqrdsgjygglkhvot.supabase.co';
+    const supabaseKey = 'sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C';
+    const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+    let roleCards = [];   // 不再用 localStorage，直接从数据库读取
+
+    // ==================== 从 Supabase 加载角色卡 ====================
+    async function loadRolesFromSupabase() {
+        try {
+            const { data, error } = await supabase
+                .from('role_cards')           // ←←← 这里改成你的真实表名！
+                .select('*')
+                .order('id', { ascending: true });
+
+            if (error) throw error;
+            roleCards = data || [];
+            console.log('✅ 从 Supabase 加载了', roleCards.length, '个角色');
             renderRoleList(roleCards);
+        } catch (err) {
+            console.error('❌ 加载角色失败:', err);
+            alert('无法连接 Supabase，请检查表名或 RLS 权限');
         }
+    }
+
+    // ==================== 创建角色时插入 Supabase ====================
+    async function handleCreateRole() {
+        const name = document.getElementById('role-name').value.trim();
+        const playType = document.getElementById('play-type-select').value;
+        const description = document.getElementById('role-desc').value.trim();
+        const tags = document.getElementById('role-tags').value.trim();
+        const avatar = document.getElementById('role-avatar').value.trim() || 'https://picsum.photos/id/1005/800/600';
+        const nsfw = document.getElementById('nsfw-toggle').checked;
+
+        if (!name) {
+            alert('角色名称不能为空！');
+            return;
+        }
+
+        try {
+            const { error } = await supabase
+                .from('role_cards')           // ←←← 这里也要和上面保持一致
+                .insert([{
+                    name: name,
+                    play_type: playType,
+                    description: description || '这是一个新角色～',
+                    tags: tags,
+                    avatar: avatar,
+                    nsfw: nsfw,
+                    favorability: 0
+                }]);
+
+            if (error) throw error;
+
+            alert('🎉 角色卡创建成功！');
+            document.getElementById('create-modal').classList.add('hidden');
+            await loadRolesFromSupabase();   // 刷新列表
+        } catch (err) {
+            console.error(err);
+            alert('创建失败：' + err.message);
+        }
+    }
+
+    // ==================== 页面初始化（已改成 Supabase 版本） ====================
+    function initializeApp() {
+            // ==================== Supabase 配置（已接入你提供的项目） ====================
+    const supabaseUrl = 'https://pttzjqrdsgjygglkhvot.supabase.co';
+    const supabaseKey = 'sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C';
+    const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+    let roleCards = [];   // 不再用 localStorage，直接从数据库读取
+
+    // ==================== 从 Supabase 加载角色卡 ====================
+    async function loadRolesFromSupabase() {
+        try {
+            const { data, error } = await supabase
+                .from('role_cards')           // ←←← 这里改成你的真实表名！
+                .select('*')
+                .order('id', { ascending: true });
+
+            if (error) throw error;
+            roleCards = data || [];
+            console.log('✅ 从 Supabase 加载了', roleCards.length, '个角色');
+            renderRoleList(roleCards);
+        } catch (err) {
+            console.error('❌ 加载角色失败:', err);
+            alert('无法连接 Supabase，请检查表名或 RLS 权限');
+        }
+    }
+
+    // ==================== 创建角色时插入 Supabase ====================
+    async function handleCreateRole() {
+        const name = document.getElementById('role-name').value.trim();
+        const playType = document.getElementById('play-type-select').value;
+        const description = document.getElementById('role-desc').value.trim();
+        const tags = document.getElementById('role-tags').value.trim();
+        const avatar = document.getElementById('role-avatar').value.trim() || 'https://picsum.photos/id/1005/800/600';
+        const nsfw = document.getElementById('nsfw-toggle').checked;
+
+        if (!name) {
+            alert('角色名称不能为空！');
+            return;
+        }
+
+        try {
+            const { error } = await supabase
+                .from('role_cards')           // ←←← 这里也要和上面保持一致
+                .insert([{
+                    name: name,
+                    play_type: playType,
+                    description: description || '这是一个新角色～',
+                    tags: tags,
+                    avatar: avatar,
+                    nsfw: nsfw,
+                    favorability: 0
+                }]);
+
+            if (error) throw error;
+
+            alert('🎉 角色卡创建成功！');
+            document.getElementById('create-modal').classList.add('hidden');
+            await loadRolesFromSupabase();   // 刷新列表
+        } catch (err) {
+            console.error(err);
+            alert('创建失败：' + err.message);
+        }
+    }
+
+    // ==================== 页面初始化（已改成 Supabase 版本） ====================
+    function initializeApp() {
+        updateRealTimeClock();
+
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('time').textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        }, 60000);
+
+        // 从 Supabase 加载角色
+        // ==================== Supabase 配置（已接入你提供的项目） ====================
+    const supabaseUrl = 'https://pttzjqrdsgjygglkhvot.supabase.co';
+    const supabaseKey = 'sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C';
+    const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+    let roleCards = [];   // 不再用 localStorage，直接从数据库读取
+
+    // ==================== 从 Supabase 加载角色卡 ====================
+    async function loadRolesFromSupabase() {
+        try {
+            const { data, error } = await supabase
+                .from('role_cards')           // ←←← 这里改成你的真实表名！
+                .select('*')
+                .order('id', { ascending: true });
+
+            if (error) throw error;
+            roleCards = data || [];
+            console.log('✅ 从 Supabase 加载了', roleCards.length, '个角色');
+            renderRoleList(roleCards);
+        } catch (err) {
+            console.error('❌ 加载角色失败:', err);
+            alert('无法连接 Supabase，请检查表名或 RLS 权限');
+        }
+    }
+
+    // ==================== 创建角色时插入 Supabase ====================
+    async function handleCreateRole() {
+        const name = document.getElementById('role-name').value.trim();
+        const playType = document.getElementById('play-type-select').value;
+        const description = document.getElementById('role-desc').value.trim();
+        const tags = document.getElementById('role-tags').value.trim();
+        const avatar = document.getElementById('role-avatar').value.trim() || 'https://picsum.photos/id/1005/800/600';
+        const nsfw = document.getElementById('nsfw-toggle').checked;
+
+        if (!name) {
+            alert('角色名称不能为空！');
+            return;
+        }
+
+        try {
+            const { error } = await supabase
+                .from('role_cards')           // ←←← 这里也要和上面保持一致
+                .insert([{
+                    name: name,
+                    play_type: playType,
+                    description: description || '这是一个新角色～',
+                    tags: tags,
+                    avatar: avatar,
+                    nsfw: nsfw,
+                    favorability: 0
+                }]);
+
+            if (error) throw error;
+
+            alert('🎉 角色卡创建成功！');
+            document.getElementById('create-modal').classList.add('hidden');
+            await loadRolesFromSupabase();   // 刷新列表
+        } catch (err) {
+            console.error(err);
+            alert('创建失败：' + err.message);
+        }
+    }
+
+    // ==================== 页面初始化（已改成 Supabase 版本） ====================
+    function initializeApp() {
+        const supabaseUrl = 'https://pttzjqrdsgjygglkhvot.supabase.co';
+        const supabaseKey = 'sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C';
+        const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+        let roleCards = [];
+// ==================== 从 Supabase 加载角色卡 ====================
+        async function loadRolesFromSupabase() {
+        try {
+            const { data, error } = await supabase
+                .from('role_cards')
+                .select('*')
+                .order('id', { ascending: true });
+
+            if (error) throw error;
+            roleCards = data || [];
+            console.log('✅ 从 Supabase 加载了', roleCards.length, '个角色');
+            renderRoleList(roleCards);
+        } catch (err) {
+            console.error('❌ 加载角色失败:', err);
+            alert('无法连接 Supabase，请检查表名或 RLS 权限');
+        }
+    }
+/ ==================== 创建角色时插入 Supabase ====================
+    async function handleCreateRole() {
+        const name = document.getElementById('role-name').value.trim();
+        const playType = document.getElementById('play-type-select').value;
+        const description = document.getElementById('role-desc').value.trim();
+        const tags = document.getElementById('role-tags').value.trim();
+        const avatar = document.getElementById('role-avatar').value.trim() || 'https://picsum.photos/id/1005/800/600';
+        const nsfw = document.getElementById('nsfw-toggle').checked;
         
+        if (!name) {
+            alert('角色名称不能为空！');
+            return;
+        }
+
+        try {
+            const { error } = await supabase
+                .from('role_cards')           // ←←← 这里也要和上面保持一致
+                .insert([{
+                    name: name,
+                    play_type: playType,
+                    description: description || '这是一个新角色～',
+                    tags: tags,
+                    avatar: avatar,
+                    nsfw: nsfw,
+                    favorability: 0
+                }]);
+
+            if (error) throw error;
+
+            alert('🎉 角色卡创建成功！');
+            document.getElementById('create-modal').classList.add('hidden');
+            await loadRolesFromSupabase();   // 刷新列表
+        } catch (err) {
+            console.error(err);
+            alert('创建失败：' + err.message);
+        }
+    }
+        // ==================== 页面初始化（已改成 Supabase 版本） ====================
+    function initializeApp() {
+        updateRealTimeClock();
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('time').textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        }, 60000);
+
+        // 从 Supabase 加载角色
+        loadRolesFromSupabase();
+        console.log('✅ AI陪聊页面 + Supabase 初始化完成');
+    }
         window.onload = initializeApp;
+}
+        
     </script>
 </body>
 </html>
