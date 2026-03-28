@@ -298,8 +298,7 @@
         // Supabase 配置（只在这里声明一次）
         const supabaseUrl = 'https://pttzjqrdsgjygglkhvot.supabase.co';
         const supabaseKey = 'sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C';
-        const { createClient } = Supabase;
-        const supabase = createClient(supabaseUrl, supabaseKey);
+        const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
 
         // 全局变量
         let roleCards = [];
@@ -570,6 +569,12 @@
         
         function logout() {
             alert('已退出登录');
+        }
+        function renderHistory() {
+            // TODO: 后续实现历史记录渲染
+            console.log('📜 历史记录页面已打开（功能待完善）');
+            const container = document.getElementById('history-list'); // 如果你有这个 id
+            if (container) container.innerHTML = '<div class="p-8 text-center text-gray-400">暂无对话历史</div>';
         }
         
         // ==================== 初始化 ====================
