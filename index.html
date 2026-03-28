@@ -10,10 +10,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
         
-        :root {
-            --primary: #c026d3;
-        }
-        
         body {
             font-family: 'Noto Sans SC', system-ui, sans-serif;
         }
@@ -117,17 +113,15 @@
         <!-- App 主界面 -->
         <div class="h-[calc(100vh-48px)] flex flex-col overflow-hidden">
             
-            <!-- 顶部栏（跟你截图完全一致） -->
+            <!-- 顶部栏 -->
             <div class="px-4 py-3 flex items-center justify-between border-b border-gray-700 bg-gray-900">
                 <div class="bg-blue-600 text-white font-bold text-xl px-4 py-1 rounded-2xl">AI 陪聊</div>
                 
-                <!-- 钻石余额 -->
                 <div onclick="showBalance()" class="flex items-center gap-1 bg-gray-800 px-4 h-9 rounded-3xl cursor-pointer">
                     <i class="fa-solid fa-gem text-yellow-400"></i>
                     <span id="diamond-balance" class="font-semibold">4892</span>
                 </div>
                 
-                <!-- 浅色切换 -->
                 <button onclick="toggleTheme()" class="flex items-center gap-2 bg-gray-800 px-5 h-9 rounded-3xl text-sm font-medium">
                     <i id="theme-icon" class="fa-solid fa-sun text-yellow-400"></i>
                     <span id="theme-text">浅色</span>
@@ -139,10 +133,10 @@
                 </div>
             </div>
 
-            <!-- 页面内容区域 -->
+            <!-- 页面内容 -->
             <div id="page-content" class="flex-1 overflow-auto bg-gray-900">
                 
-                <!-- 发现角色页（跟你原本样子完全一致） -->
+                <!-- 发现角色页 -->
                 <div id="discover-page" class="p-4">
                     <div class="flex justify-between items-center mb-4">
                         <div class="text-2xl font-semibold">发现角色</div>
@@ -152,14 +146,12 @@
                         </button>
                     </div>
                     
-                    <!-- 搜索栏 -->
                     <div class="relative mb-6">
                         <input id="search-input" type="text" placeholder="搜索角色名称 / 关键词 / 标签" 
                                class="w-full bg-gray-800 px-5 py-3 pl-12 rounded-3xl outline-none text-sm">
                         <i class="fa-solid fa-magnifying-glass absolute left-5 top-3.5 text-gray-400"></i>
                     </div>
                     
-                    <!-- 筛选标签 -->
                     <div class="flex gap-2 overflow-x-auto pb-3 mb-4">
                         <div onclick="filterByType(this)" data-type="all" class="select-playtype active px-5 py-1 bg-pink-600 text-white rounded-3xl text-sm whitespace-nowrap">全部</div>
                         <div onclick="filterByType(this)" data-type="养成" class="select-playtype px-5 py-1 bg-gray-800 rounded-3xl text-sm whitespace-nowrap">养成系统</div>
@@ -167,7 +159,6 @@
                         <div onclick="filterByType(this)" data-type="NSFW" class="select-playtype px-5 py-1 bg-gray-800 rounded-3xl text-sm whitespace-nowrap">NSFW</div>
                     </div>
                     
-                    <!-- 角色列表 -->
                     <div id="role-list" class="grid grid-cols-2 gap-4"></div>
                 </div>
                 
@@ -233,7 +224,7 @@
                     </div>
                 </div>
                 
-                <!-- 商店 / 充值页 -->
+                <!-- 商店页 -->
                 <div id="shop-page" class="hidden p-4">
                     <div class="text-2xl font-semibold mb-6">钻石商店</div>
                     <div class="bg-gray-800 rounded-3xl p-6 text-center">
@@ -302,9 +293,9 @@
         </div>
     </div>
 
-    <!-- 完整 JS 脚本（所有功能一个都没有省略） -->
+    <!-- 完整 JS（supabase 只声明一次，所有函数全部定义） -->
     <script>
-        // Supabase 配置（只声明一次）
+        // Supabase 配置（只在这里声明一次）
         const supabaseUrl = 'https://pttzjqrdsgjygglkhvot.supabase.co';
         const supabaseKey = 'sb_publishable_klCt2wEdrNWEflRnLENNNg_gGYJfs3C';
         const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
@@ -432,16 +423,14 @@
                 alert('创建失败：' + error.message);
                 return;
             }
-            alert('🎉 角色卡创建成功！已存入 Supabase');
+            alert('🎉 角色卡创建成功！');
             backToDiscover();
             await loadRolesFromSupabase();
         }
 
         // ==================== 页面切换 ====================
         function switchPage(pageId) {
-            document.querySelectorAll('#page-content > div').forEach(page => {
-                page.classList.add('hidden');
-            });
+            document.querySelectorAll('#page-content > div').forEach(page => page.classList.add('hidden'));
             const target = document.getElementById(pageId);
             if (target) target.classList.remove('hidden');
             
@@ -571,7 +560,7 @@
         }
         
         function viewAllImages() {
-            alert('📸 这里显示所有生成的图片（可按剧本 / 人物卡分类查看）\n功能已就绪');
+            alert('📸 这里显示所有生成的图片（可按剧本 / 人物卡分类查看）');
         }
         
         function showDM() {
