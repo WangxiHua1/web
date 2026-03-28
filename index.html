@@ -147,41 +147,61 @@
 
     <!-- ==================== 创作页 ==================== -->
     <div id="tab-2" class="tab-page hidden px-4 py-6">
-      <h2 class="text-2xl font-bold mb-6">创建新人物卡 / 剧本</h2>
+      <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">✨ 创建新人物卡 / 剧本</h2>
       
-      <div class="bg-white rounded-3xl shadow-sm p-6 space-y-6">
+      <div class="bg-white rounded-3xl shadow-sm p-6 space-y-8">
+
+        <!-- AI角色名（必填） -->
         <div>
           <div class="text-xs text-[#9f1239] mb-2">角色名字（必填）</div>
-          <input id="aiRoleName" type="text" placeholder="Yuki" class="w-full bg-[#f8f0f5] rounded-3xl px-6 py-4 outline-none">
+          <input id="aiRoleName" type="text" placeholder="例如：Yuki" class="w-full bg-[#f8f0f5] rounded-3xl px-6 py-4 outline-none text-sm">
         </div>
 
-        <div class="flex gap-4">
-          <div class="flex-1">
-            <div class="text-xs text-[#9f1239] mb-2">AI类型</div>
-            <div class="flex gap-2">
-              <button onclick="selectType(this, '养成')" class="type-btn flex-1 bg-[#f8f0f5] py-4 rounded-3xl font-medium active">养成系统</button>
-              <button onclick="selectType(this, '剧本')" class="type-btn flex-1 bg-[#f8f0f5] py-4 rounded-3xl font-medium">剧本系统</button>
-            </div>
+        <!-- 用户角色名（可选） -->
+        <div>
+          <div class="text-xs text-[#9f1239] mb-2">用户角色名（可选，不会显示在聊天中）</div>
+          <input id="userRoleName" type="text" placeholder="帮助AI生成更精准对话内容" class="w-full bg-[#f8f0f5] rounded-3xl px-6 py-4 outline-none text-sm">
+        </div>
+
+        <!-- AI类型（已修改为“养成系统”和“剧本系统”，选中颜色更明显） -->
+        <div>
+          <div class="text-xs text-[#9f1239] mb-2">AI类型</div>
+          <div class="flex gap-3">
+            <button onclick="selectType(this, '养成')" 
+                    class="type-btn flex-1 bg-[#f8f0f5] py-4 rounded-3xl font-medium active ring-2 ring-[#ec4899] text-[#ec4899]">
+              养成系统
+            </button>
+            <button onclick="selectType(this, '剧本')" 
+                    class="type-btn flex-1 bg-[#f8f0f5] py-4 rounded-3xl font-medium">
+              剧本系统
+            </button>
           </div>
-          <div class="flex-1">
-            <div class="text-xs text-[#9f1239] mb-2">智能等级 (1-5)</div>
-            <select id="aiLevel" class="w-full bg-[#f8f0f5] rounded-3xl px-6 py-4 outline-none">
-              <option value="1">1 - 基础</option>
-              <option value="2">2 - 普通</option>
-              <option value="3" selected>3 - 聪明</option>
-              <option value="4">4 - 高级</option>
-              <option value="5">5 - 顶级智能</option>
-            </select>
-          </div>
+        </div>
+
+        <!-- 智能等级（保持不变） -->
+        <div>
+          <div class="text-xs text-[#9f1239] mb-2">智能等级 (1-5)</div>
+          <select id="aiLevel" class="w-full bg-[#f8f0f5] rounded-3xl px-6 py-4 outline-none">
+            <option value="1">1 - 基础</option>
+            <option value="2" selected>2 - 普通</option>
+            <option value="3">3 - 聪明</option>
+            <option value="4">4 - 高级</option>
+            <option value="5">5 - 顶级智能</option>
+          </select>
         </div>
 
         <!-- NSFW + 性癖 -->
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3"><span>NSFW</span>
-            <label class="relative inline-flex cursor-pointer"><input type="checkbox" id="nsfwToggle" onchange="toggleNSFW()" class="sr-only peer"><div class="w-11 h-6 bg-[#e2d4f0] peer-focus:ring-4 peer-focus:ring-[#ec4899] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#ec4899]"></div></label>
+          <div class="flex items-center gap-3">
+            <span>NSFW</span>
+            <label class="relative inline-flex cursor-pointer">
+              <input type="checkbox" id="nsfwToggle" onchange="toggleNSFW()" class="sr-only peer">
+              <div class="w-11 h-6 bg-[#e2d4f0] peer-focus:ring-4 peer-focus:ring-[#ec4899] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#ec4899]"></div>
+            </label>
           </div>
           <span id="nsfwStatus" class="text-xs text-[#9f1239]">关闭</span>
         </div>
+
         <div id="fetishSection" class="hidden">
           <div class="text-xs text-[#9f1239] mb-2">性癖（多个用逗号分隔）</div>
           <input id="fetishInput" type="text" placeholder="轻SM、足控、反差、母子..." class="w-full bg-[#f8f0f5] rounded-3xl px-6 py-4 outline-none">
@@ -196,15 +216,22 @@
         <!-- 隐私设置 -->
         <div class="flex items-center justify-between">
           <span>是否公开（别人可查看/收藏）</span>
-          <label class="relative inline-flex cursor-pointer"><input type="checkbox" id="publicToggle" checked class="sr-only peer"><div class="w-11 h-6 bg-[#e2d4f0] peer-focus:ring-4 peer-focus:ring-[#ec4899] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#ec4899]"></div></label>
+          <label class="relative inline-flex cursor-pointer">
+            <input type="checkbox" id="publicToggle" checked class="sr-only peer">
+            <div class="w-11 h-6 bg-[#e2d4f0] peer-focus:ring-4 peer-focus:ring-[#ec4899] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#ec4899]"></div>
+          </label>
         </div>
 
+        <!-- 角色定义 -->
         <div>
           <div class="text-xs text-[#9f1239]">角色定义 / 剧本描述</div>
-          <textarea id="appearance" rows="4" class="w-full bg-[#f8f0f5] rounded-3xl px-6 py-4 outline-none resize-none">身高165cm，长相甜美，穿着高中校服，性格害羞黏人</textarea>
+          <textarea id="appearance" rows="4" class="w-full bg-[#f8f0f5] rounded-3xl px-6 py-4 outline-none resize-none">身高165cm，长相甜美，穿着高中校服</textarea>
         </div>
 
-        <button onclick="createCharacter()" class="w-full bg-[#ec4899] text-white py-5 rounded-3xl text-xl font-semibold">提交创建</button>
+        <button onclick="createCharacter()" 
+                class="w-full bg-[#ec4899] text-white py-5 rounded-3xl text-xl font-semibold active:scale-95 transition">
+          提交创建
+        </button>
       </div>
     </div>
 
@@ -242,15 +269,22 @@
     <button onclick="switchTab(4)" class="flex-1 flex flex-col items-center">👤 我的</button>
   </div>
 
-  <!-- 全局模态框容器 -->
-  <div id="modalContainer" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50"></div>
-
   <script>
+    let currentType = '养成';   // 默认选中养成系统
+
+    function selectType(btn, type) {
+      document.querySelectorAll('.type-btn').forEach(b => {
+        b.classList.remove('bg-[#ec4899]', 'text-white', 'ring-2', 'ring-[#ec4899]');
+        b.classList.add('bg-[#f8f0f5]');
+      });
+      btn.classList.add('bg-[#ec4899]', 'text-white', 'ring-2', 'ring-[#ec4899]');   // 选中颜色更明显（粉色+外圈）
+      currentType = type;
+    }
     // ==================== 全局数据（模拟 Supabase） ====================
     let characters = JSON.parse(localStorage.getItem('characters')) || [];
     let userFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
     let generatedImages = JSON.parse(localStorage.getItem('generatedImages')) || [];
-    let diamondBalance = parseInt(localStorage.getItem('diamondBalance')) || 5760;
+    let diamondBalance = parseInt(localStorage.getItem('diamondBalance')) || 000;
     let currentChat = null;
     let messagesHistory = [];
 
