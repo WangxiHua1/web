@@ -8,59 +8,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
-        :root {
-            --tw-color-primary: #a855f7;
-        }
-        body {
-            font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
-        }
-        .chat-bubble-user {
-            background: linear-gradient(90deg, #22d3ee, #06b67f);
-            color: #000;
-        }
-        .chat-bubble-ai {
-            background: linear-gradient(90deg, #a855f7, #7c3aed);
-            color: #fff;
-        }
-        .action-text {
-            color: #f472b6;
-            font-style: italic;
-        }
-        .modal {
-            animation: modalPop 0.3s ease;
-        }
-        @keyframes modalPop {
-            0% { transform: scale(0.95); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .page {
-            animation: fadeIn 0.2s ease;
-        }
-        .nav-active {
-            color: #a855f7;
-        }
+        :root { --tw-color-primary: #a855f7; }
+        body { font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif; }
+        .chat-bubble-user { background: linear-gradient(90deg, #22d3ee, #06b67f); color: #000; }
+        .chat-bubble-ai { background: linear-gradient(90deg, #a855f7, #7c3aed); color: #fff; }
+        .action-text { color: #f472b6; font-style: italic; }
+        .modal { animation: modalPop 0.3s ease; }
+        @keyframes modalPop { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .page { animation: fadeIn 0.2s ease; }
+        .nav-active { color: #a855f7 !important; }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen pb-20">
+
     <!-- 顶部栏 -->
     <header class="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50 shadow-md">
         <div class="flex items-center gap-x-3">
-            <div class="w-9 h-9 bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl flex items-center justify-center text-white text-2xl shadow-inner">
-                🤖
-            </div>
+            <div class="w-9 h-9 bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl flex items-center justify-center text-white text-2xl shadow-inner">🤖</div>
             <div>
                 <h1 class="text-2xl font-bold tracking-tighter">AI角色</h1>
                 <p class="text-[10px] text-gray-400 -mt-1">Telegram 小程序</p>
             </div>
         </div>
-        
-        <!-- 余额显示 -->
         <div onclick="showRechargeModal()" class="flex items-center bg-gray-800 hover:bg-gray-700 rounded-3xl px-4 py-1 cursor-pointer transition-colors">
             <i class="fas fa-gem text-yellow-400 text-xl mr-1"></i>
             <span id="top-balance" class="font-semibold text-lg">12,480</span>
             <span class="text-xs text-gray-400 ml-1">钻石</span>
         </div>
-        
         <div class="flex items-center gap-x-2">
             <div class="text-xs px-3 py-1 bg-gray-800 rounded-2xl flex items-center">
                 <span id="current-level-badge" class="font-bold text-purple-400">Lv.3</span>
@@ -77,26 +51,11 @@
     <!-- 底部导航 -->
     <nav class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 py-2 px-4 z-50">
         <div class="max-w-xl mx-auto flex justify-around items-center">
-            <button onclick="switchTab(0)" class="nav-btn flex flex-col items-center gap-y-1 text-gray-400 nav-active" id="nav-0">
-                <i class="fas fa-house text-2xl"></i>
-                <span class="text-xs font-medium">首页</span>
-            </button>
-            <button onclick="switchTab(1)" class="nav-btn flex flex-col items-center gap-y-1 text-gray-400" id="nav-1">
-                <i class="fas fa-id-card-clip text-2xl"></i>
-                <span class="text-xs font-medium">人物卡</span>
-            </button>
-            <button onclick="switchTab(2)" class="nav-btn flex flex-col items-center gap-y-1 text-gray-400" id="nav-2">
-                <i class="fas fa-comments text-2xl"></i>
-                <span class="text-xs font-medium">聊天</span>
-            </button>
-            <button onclick="switchTab(3)" class="nav-btn flex flex-col items-center gap-y-1 text-gray-400" id="nav-3">
-                <i class="fas fa-images text-2xl"></i>
-                <span class="text-xs font-medium">画廊</span>
-            </button>
-            <button onclick="switchTab(4)" class="nav-btn flex flex-col items-center gap-y-1 text-gray-400" id="nav-4">
-                <i class="fas fa-user-circle text-2xl"></i>
-                <span class="text-xs font-medium">我的</span>
-            </button>
+            <button onclick="switchTab(0)" class="nav-btn flex flex-col items-center gap-y-1 text-gray-400 nav-active" id="nav-0"><i class="fas fa-house text-2xl"></i><span class="text-xs font-medium">首页</span></button>
+            <button onclick="switchTab(1)" class="nav-btn flex flex-col items-center gap-y-1 text-gray-400" id="nav-1"><i class="fas fa-id-card-clip text-2xl"></i><span class="text-xs font-medium">人物卡</span></button>
+            <button onclick="switchTab(2)" class="nav-btn flex flex-col items-center gap-y-1 text-gray-400" id="nav-2"><i class="fas fa-comments text-2xl"></i><span class="text-xs font-medium">聊天</span></button>
+            <button onclick="switchTab(3)" class="nav-btn flex flex-col items-center gap-y-1 text-gray-400" id="nav-3"><i class="fas fa-images text-2xl"></i><span class="text-xs font-medium">画廊</span></button>
+            <button onclick="switchTab(4)" class="nav-btn flex flex-col items-center gap-y-1 text-gray-400" id="nav-4"><i class="fas fa-user-circle text-2xl"></i><span class="text-xs font-medium">我的</span></button>
         </div>
     </nav>
 
@@ -108,70 +67,30 @@
                     <h2 class="text-2xl font-bold">创建新人物卡</h2>
                     <button onclick="hideCreateModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-2xl"></i></button>
                 </div>
-                
                 <form id="create-form" onsubmit="createCharacter(event)">
                     <div class="space-y-6">
-                        <!-- 名称 -->
-                        <div>
-                            <label class="block text-sm text-gray-400 mb-1">人物名称</label>
-                            <input type="text" id="char-name" required placeholder="例如：温柔学姐" 
-                                   class="w-full bg-gray-800 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
-                        </div>
-                        
-                        <!-- 类型 -->
-                        <div>
-                            <label class="block text-sm text-gray-400 mb-1">类型</label>
+                        <div><label class="block text-sm text-gray-400 mb-1">人物名称</label><input type="text" id="char-name" required placeholder="例如：温柔学姐" class="w-full bg-gray-800 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:ring-2 focus:ring-purple-500"></div>
+                        <div><label class="block text-sm text-gray-400 mb-1">类型</label>
                             <div class="flex gap-3">
-                                <button type="button" onclick="selectType(this)" data-type="养成" 
-                                        class="type-btn flex-1 py-4 rounded-2xl bg-gray-800 text-center font-medium border-2 border-transparent active:border-purple-500">养成系统</button>
-                                <button type="button" onclick="selectType(this)" data-type="剧本" 
-                                        class="type-btn flex-1 py-4 rounded-2xl bg-gray-800 text-center font-medium border-2 border-transparent">剧本系统</button>
+                                <button type="button" onclick="selectType(this)" data-type="养成" class="type-btn flex-1 py-4 rounded-2xl bg-gray-800 text-center font-medium border-2 border-transparent">养成系统</button>
+                                <button type="button" onclick="selectType(this)" data-type="剧本" class="type-btn flex-1 py-4 rounded-2xl bg-gray-800 text-center font-medium border-2 border-transparent">剧本系统</button>
                             </div>
                         </div>
-                        
-                        <!-- NSFW -->
                         <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-sm text-gray-400">NSFW 内容</span>
-                            </div>
+                            <span class="text-sm text-gray-400">NSFW 内容</span>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="nsfw-toggle" onclick="toggleNSFW()" class="sr-only peer">
                                 <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
                             </label>
                         </div>
-                        
-                        <!-- 性癖（NSFW 时显示） -->
                         <div id="fetish-group" class="hidden">
                             <label class="block text-sm text-gray-400 mb-1">性癖标签（可选）</label>
-                            <input type="text" id="char-fetish" placeholder="例如：足控、轻SM、温柔调教" 
-                                   class="w-full bg-gray-800 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <input type="text" id="char-fetish" placeholder="例如：足控、轻SM、温柔调教" class="w-full bg-gray-800 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                         </div>
-                        
-                        <!-- 标签 -->
-                        <div>
-                            <label class="block text-sm text-gray-400 mb-1">标签（用逗号分隔）</label>
-                            <input type="text" id="char-tags" placeholder="温柔、校园、御姐" 
-                                   class="w-full bg-gray-800 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
-                        </div>
-                        
-                        <!-- 描述 -->
-                        <div>
-                            <label class="block text-sm text-gray-400 mb-1">人物卡描述 / 剧本开头</label>
-                            <textarea id="char-desc" rows="4" required placeholder="描述一下这个角色..." 
-                                      class="w-full bg-gray-800 rounded-3xl px-4 py-4 text-lg focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
-                        </div>
-                        
-                        <!-- 是否公开 -->
-                        <div class="flex items-center gap-2">
-                            <input type="checkbox" id="public-toggle" checked class="w-5 h-5 accent-purple-500">
-                            <label class="text-sm">允许其他人查看并收藏</label>
-                        </div>
-                        
-                        <button type="submit" 
-                                class="w-full py-4 bg-gradient-to-r from-purple-500 to-violet-600 rounded-3xl text-lg font-semibold flex items-center justify-center gap-x-2">
-                            <i class="fas fa-plus"></i>
-                            创建人物卡
-                        </button>
+                        <div><label class="block text-sm text-gray-400 mb-1">标签（用逗号分隔）</label><input type="text" id="char-tags" placeholder="温柔,校园,御姐" class="w-full bg-gray-800 rounded-2xl px-4 py-4 text-lg focus:outline-none focus:ring-2 focus:ring-purple-500"></div>
+                        <div><label class="block text-sm text-gray-400 mb-1">人物卡描述 / 剧本开头</label><textarea id="char-desc" rows="4" required placeholder="描述一下这个角色..." class="w-full bg-gray-800 rounded-3xl px-4 py-4 text-lg focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea></div>
+                        <div class="flex items-center gap-2"><input type="checkbox" id="public-toggle" checked class="w-5 h-5 accent-purple-500"><label class="text-sm">允许其他人查看并收藏</label></div>
+                        <button type="submit" class="w-full py-4 bg-gradient-to-r from-purple-500 to-violet-600 rounded-3xl text-lg font-semibold flex items-center justify-center gap-x-2"><i class="fas fa-plus"></i>创建人物卡</button>
                     </div>
                 </form>
             </div>
@@ -183,12 +102,9 @@
         <div onclick="event.stopImmediatePropagation()" class="modal bg-gray-900 w-full max-w-md mx-4 rounded-3xl p-6">
             <h2 class="text-2xl font-bold mb-6">卡密充值</h2>
             <p class="text-gray-400 mb-4">1 RMB = 1000 钻石</p>
-            <input id="card-key" type="text" placeholder="输入卡密" 
-                   class="w-full bg-gray-800 rounded-2xl px-5 py-4 text-lg mb-6 focus:outline-none focus:ring-2 focus:ring-yellow-400">
-            <button onclick="redeemCardKey()" 
-                    class="w-full py-4 bg-yellow-400 text-black font-bold rounded-3xl text-lg">立即充值</button>
+            <input id="card-key" type="text" placeholder="输入卡密" class="w-full bg-gray-800 rounded-2xl px-5 py-4 text-lg mb-6 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+            <button onclick="redeemCardKey()" class="w-full py-4 bg-yellow-400 text-black font-bold rounded-3xl text-lg">立即充值</button>
             <button onclick="hideRechargeModal()" class="mt-4 text-gray-400 w-full">取消</button>
-            <div class="text-xs text-gray-500 mt-8 text-center">提示：DM 功能可赠送钻石（仅 Telegram 命令）</div>
         </div>
     </div>
 
@@ -205,647 +121,401 @@
         </div>
     </div>
 
-    <script>
-        // ==================== 全局变量 ====================
-        let currentTab = 0
-        let currentLevel = 3                              // AI 智能等级 1-5
-        let diamonds = 12480
-        let selectedType = '养成'                         // 创建时默认类型
-        
-        // 当前选中聊天的人物ID
-        let currentChatCharacterId = null
-        
-        // Mock 用户数据
-        let myCreatedCharacters = []
-        let collectedCharacters = []
-        
-        // 所有人物卡（探索用）
-        let allCharacters = [
-            {
-                id: 1,
-                name: "温柔学姐",
-                type: "养成",
-                nsfw: false,
-                tags: ["校园", "温柔", "御姐"],
-                description: "大学文学社社长，喜欢在图书馆陪你聊天。",
-                favor: 65,
-                bodyDev: 0,
-                fetish: "",
-                isPublic: true,
-                owner: "你"
-            },
-            {
-                id: 2,
-                name: "魅魔公主",
-                type: "剧本",
-                nsfw: true,
-                tags: ["幻想", "女王", "黑暗"],
-                description: "来自魔界的公主，她想要你成为她的专属仆从…",
-                favor: 0,
-                bodyDev: 45,
-                fetish: "足控、轻SM、调教",
-                isPublic: true,
-                owner: "系统"
-            },
-            {
-                id: 3,
-                name: "AI女友",
-                type: "养成",
-                nsfw: true,
-                tags: ["现代", "甜宠", "日常"],
-                description: "24小时在线的专属女友，随时随地关心你。",
-                favor: 88,
-                bodyDev: 72,
-                fetish: "吻痕、耳语、拥抱",
-                isPublic: false,
-                owner: "你"
-            },
-            {
-                id: 4,
-                name: "末世幸存者",
-                type: "剧本",
-                nsfw: false,
-                tags: ["末世", "冒险", "硬核"],
-                description: "废土世界里唯一信任的人，她手持霰弹枪。",
-                favor: 0,
-                bodyDev: 0,
-                fetish: "",
-                isPublic: true,
-                owner: "系统"
-            }
-        ]
-        
-        // 每个角色的聊天记录
-        let chatHistories = {
-            1: [],
-            2: [],
-            3: [],
-            4: []
+<script>
+    // ==================== 配置（只改这一行） ====================
+    const BACKEND_URL = "ai-bot-production-4ff0.up.railway.app";   
+    const TG_ID = 123456789;   // ← 测试用，后面可改成 Telegram.WebApp.initDataUnsafe.user.id
+
+    let currentTab = 0;
+    let currentLevel = 3;
+    let diamonds = 12480;
+    let selectedType = '养成';
+    let currentChatCharacterId = null;
+    let allCharacters = [];
+    let chatHistories = {};
+    let generatedImages = [];
+    let myCreatedCharacters = [];
+    let collectedCharacters = [];
+
+    // ==================== API 函数 ====================
+    async function apiGet(path) {
+        const res = await fetch(`${BACKEND_URL}${path}`);
+        if (!res.ok) throw new Error('请求失败');
+        return res.json();
+    }
+    async function apiPost(path, body) {
+        const res = await fetch(`${BACKEND_URL}${path}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error('请求失败');
+        return res.json();
+    }
+
+    // ==================== 工具函数 ====================
+    function updateBalance() {
+        document.getElementById('top-balance').innerHTML = `<i class="fas fa-gem text-yellow-400 text-xl mr-1"></i>${diamonds.toLocaleString()}`;
+    }
+
+    async function loadBalance() {
+        try {
+            const data = await apiGet(`/api/balance?tg_id=${TG_ID}`);
+            diamonds = data.diamonds;
+            currentLevel = data.ai_level;
+            document.getElementById('current-level-badge').textContent = `Lv.${currentLevel}`;
+            updateBalance();
+        } catch(e) { console.log("余额加载失败"); }
+    }
+
+    async function loadCharacters() {
+        try {
+            allCharacters = await apiGet('/api/characters');
+        } catch(e) { console.log("加载人物卡失败"); }
+    }
+
+    async function loadMyCharacters() {
+        try {
+            myCreatedCharacters = await apiGet(`/api/my-characters?tg_id=${TG_ID}`);
+        } catch(e) { console.log("加载我的卡失败"); }
+    }
+
+    async function loadGallery() {
+        try {
+            generatedImages = await apiGet('/api/gallery');
+        } catch(e) { console.log("加载画廊失败"); }
+    }
+
+    // ==================== 人物卡创建 ====================
+    async function createCharacter(e) {
+        e.preventDefault();
+        const data = {
+            name: document.getElementById('char-name').value,
+            type: selectedType,
+            nsfw: document.getElementById('nsfw-toggle').checked,
+            fetish: document.getElementById('char-fetish').value || '',
+            tags: document.getElementById('char-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+            description: document.getElementById('char-desc').value,
+            is_public: document.getElementById('public-toggle').checked
+        };
+        try {
+            const newChar = await apiPost('/api/create-character', { ...data, tg_id: TG_ID });
+            allCharacters.unshift(newChar);
+            myCreatedCharacters.unshift(newChar);
+            hideCreateModal();
+            alert('✅ 人物卡创建成功！');
+            switchTab(1);
+            showCardTab(0);
+        } catch(e) { alert('❌ 创建失败，请重试'); }
+    }
+
+    // ==================== 聊天 ====================
+    async function sendMessage() {
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        if (!text || !currentChatCharacterId) return;
+
+        const history = chatHistories[currentChatCharacterId] || [];
+        const now = new Date();
+        const time = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+        history.push({ isUser: true, text: text, time: time });
+        input.value = '';
+        renderCurrentPage();
+
+        try {
+            const res = await apiPost('/api/send-message', {
+                tg_id: TG_ID,
+                char_id: currentChatCharacterId,
+                message: text
+            });
+            history.push({ isUser: false, text: res.reply || "收到～", time: `${now.getHours()}:${(now.getMinutes()+1).toString().padStart(2, '0')}` });
+            renderCurrentPage();
+        } catch(e) {
+            history.push({ isUser: false, text: "❌ 网络错误，请重试", time: time });
+            renderCurrentPage();
         }
-        
-        // 所有生成的图片（全局画廊）
-        let generatedImages = [
-            { id: 1, url: "https://picsum.photos/id/1015/600/800", desc: "温柔学姐图书馆场景", charId: 1 },
-            { id: 2, url: "https://picsum.photos/id/201/600/800", desc: "魅魔公主夜间宫殿", charId: 2 },
-            { id: 3, url: "https://picsum.photos/id/1005/600/800", desc: "AI女友自拍", charId: 3 },
-            { id: 4, url: "https://picsum.photos/id/870/600/800", desc: "末世废土夕阳", charId: 4 }
-        ]
-        
-        // ==================== Tailwind 初始化 ====================
-        function initTailwind() {
-            tailwind.config = {
-                content: [],
-                theme: {
-                    extend: {}
-                }
-            }
+    }
+
+    async function generateImage() {
+        if (!currentChatCharacterId) return;
+        const modal = document.getElementById('image-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        const preview = document.getElementById('generated-image-preview');
+        preview.innerHTML = `<div class="animate-spin w-12 h-12 border-4 border-purple-400 border-t-transparent rounded-full mx-auto mb-4"></div><p class="text-purple-300">X.AI 正在生成…</p>`;
+
+        try {
+            const res = await apiPost('/api/generate-image', {
+                char_id: currentChatCharacterId,
+                prompt: "根据当前对话生成"
+            });
+            preview.innerHTML = `<img src="${res.image_url}" class="w-full h-full object-cover rounded-3xl">`;
+            document.getElementById('image-desc').textContent = '已保存到画廊';
+            generatedImages.unshift({ url: res.image_url, desc: "最新生成" });
+        } catch(e) {
+            preview.innerHTML = `<p class="text-red-400">生成失败</p>`;
         }
-        
-        // ==================== 工具函数 ====================
-        function updateBalance() {
-            document.getElementById('top-balance').innerHTML = `
-                <i class="fas fa-gem text-yellow-400 text-xl mr-1"></i>
-                ${diamonds.toLocaleString()}
-            `
-        }
-        
-        function deductDiamonds(cost) {
-            if (diamonds >= cost) {
-                diamonds -= cost
-                updateBalance()
-                return true
-            }
-            alert("钻石不足！请充值～")
-            return false
-        }
-        
-        // ==================== Tab 切换 ====================
-        function switchTab(tab) {
-            currentTab = tab
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('nav-active', 'text-purple-400'))
-            document.getElementById('nav-' + tab).classList.add('nav-active', 'text-purple-400')
-            renderCurrentPage()
-        }
-        
-        function renderCurrentPage() {
-            const main = document.getElementById('main-content')
-            main.innerHTML = ''
-            
-            if (currentTab === 0) {
-                // ==================== 首页 ====================
-                main.innerHTML = `
-                <div class="page px-4 pt-4">
-                    <div class="text-3xl font-bold mb-1">早上好，${new Date().getHours() < 12 ? '早安' : '下午好'}！👋</div>
-                    <div class="text-gray-400 mb-6">今天想和谁聊天呢？</div>
-                    
-                    <!-- AI 等级卡 -->
-                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-6 mb-8">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="uppercase text-xs tracking-widest text-purple-300">AI 智能等级</p>
-                                <div class="flex gap-x-3 mt-4">
-                                    ${[1,2,3,4,5].map(l => `
-                                        <div onclick="setLevel(${l})" class="cursor-pointer text-center ${currentLevel === l ? 'scale-110' : ''}">
-                                            <div class="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center text-3xl border-2 ${currentLevel === l ? 'border-purple-400 bg-purple-500/20' : 'border-gray-700'}">
-                                                ${l}
-                                            </div>
-                                            <p class="text-xs mt-1 ${currentLevel === l ? 'text-purple-400' : 'text-gray-400'}">${l === 5 ? '最聪明' : l === 1 ? '基础' : '智能'}</p>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-sm text-gray-400">当前消耗</div>
-                                <div class="text-4xl font-bold text-yellow-400">${currentLevel * 80} 钻石/条</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 快速人物卡 -->
-                    <h3 class="font-semibold text-lg mb-4 flex items-center gap-x-2">
-                        <span>推荐人物卡</span>
-                        <i class="fas fa-fire text-orange-400"></i>
-                    </h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        ${allCharacters.slice(0, 4).map(c => `
-                            <div onclick="enterChat(${c.id})" class="bg-gray-900 rounded-3xl overflow-hidden cursor-pointer hover:scale-105 transition">
-                                <div class="h-40 bg-gradient-to-br from-purple-400/30 to-pink-400/30 flex items-end p-4 relative">
-                                    ${c.nsfw ? `<div class="absolute top-3 right-3 bg-pink-500 text-white text-[10px] px-2 rounded-full">NSFW</div>` : ''}
-                                    <div class="text-lg font-semibold">${c.name}</div>
-                                </div>
-                                <div class="p-4">
-                                    <div class="flex flex-wrap gap-1">
-                                        ${c.tags.map(t => `<span class="text-xs bg-gray-800 px-3 py-1 rounded-3xl">${t}</span>`).join('')}
-                                    </div>
-                                    <p class="text-xs text-gray-400 mt-2 line-clamp-2">${c.description}</p>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>`
-            }
-            
-            else if (currentTab === 1) {
-                // ==================== 人物卡页 ====================
-                main.innerHTML = `
-                <div class="page px-4 pt-4">
-                    <div class="flex justify-between mb-6">
-                        <div class="flex border-b border-gray-700 text-sm">
-                            <div onclick="showCardTab(0)" id="card-tab-0" class="px-6 py-2 border-b-2 border-purple-400 font-medium">我的创建</div>
-                            <div onclick="showCardTab(1)" id="card-tab-1" class="px-6 py-2">我的收藏</div>
-                            <div onclick="showCardTab(2)" id="card-tab-2" class="px-6 py-2">全部探索</div>
-                        </div>
-                        <button onclick="showCreateModal()" 
-                                class="flex items-center justify-center w-10 h-10 bg-purple-500 rounded-2xl text-xl shadow-lg">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                    
-                    <!-- 标签筛选 -->
-                    <div class="flex gap-2 overflow-x-auto pb-3 mb-6 whitespace-nowrap">
-                        <span onclick="filterByTag(this)" class="tag-chip inline-block bg-gray-800 hover:bg-purple-500 px-5 py-1 rounded-3xl text-sm cursor-pointer">全部</span>
-                        <span onclick="filterByTag(this)" class="tag-chip inline-block bg-gray-800 hover:bg-purple-500 px-5 py-1 rounded-3xl text-sm cursor-pointer">校园</span>
-                        <span onclick="filterByTag(this)" class="tag-chip inline-block bg-gray-800 hover:bg-purple-500 px-5 py-1 rounded-3xl text-sm cursor-pointer">幻想</span>
-                        <span onclick="filterByTag(this)" class="tag-chip inline-block bg-gray-800 hover:bg-purple-500 px-5 py-1 rounded-3xl text-sm cursor-pointer">甜宠</span>
-                        <span onclick="filterByTag(this)" class="tag-chip inline-block bg-gray-800 hover:bg-purple-500 px-5 py-1 rounded-3xl text-sm cursor-pointer">末世</span>
-                        <span onclick="filterByTag(this)" class="tag-chip inline-block bg-gray-800 hover:bg-purple-500 px-5 py-1 rounded-3xl text-sm cursor-pointer">NSFW</span>
-                    </div>
-                    
-                    <div id="characters-grid" class="grid grid-cols-2 gap-4"></div>
-                </div>`
-                renderCharactersGrid(0)
-            }
-            
-            else if (currentTab === 2) {
-                // ==================== 聊天页 ====================
-                if (!currentChatCharacterId) {
-                    main.innerHTML = `
-                    <div class="page px-4 pt-8 text-center">
-                        <i class="fas fa-comments text-8xl text-gray-700 mb-6"></i>
-                        <p class="text-xl font-medium mb-2">还没有进入聊天</p>
-                        <p class="text-gray-400">先去「人物卡」选择一个角色吧～</p>
-                        <button onclick="switchTab(1)" class="mt-10 px-8 py-3 bg-purple-500 rounded-3xl">去选角色</button>
-                    </div>`
-                    return
-                }
-                
-                const char = allCharacters.find(c => c.id === currentChatCharacterId)
-                const history = chatHistories[currentChatCharacterId] || []
-                
-                let html = `
-                <div class="page flex flex-col h-[calc(100vh-64px)]">
-                    <!-- 聊天头部 -->
-                    <div class="bg-gray-900 px-4 py-3 flex items-center border-b border-gray-700">
-                        <button onclick="exitChat()" class="mr-3 text-2xl"><i class="fas fa-chevron-left"></i></button>
-                        <div class="flex-1 flex items-center gap-x-3">
-                            <div class="text-xl">${char.name}</div>
-                            ${char.nsfw ? `<span class="text-pink-400 text-xs px-2 py-px bg-pink-500/20 rounded">NSFW</span>` : ''}
-                            <span class="text-xs text-gray-400">Lv.${currentLevel}</span>
-                        </div>
-                        <div onclick="showCharacterInfo(${currentChatCharacterId})" class="text-purple-400 text-sm flex items-center gap-x-1 cursor-pointer">
-                            <i class="fas fa-info-circle"></i> 资料
-                        </div>
-                    </div>
-                    
-                    <!-- 消息列表 -->
-                    <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-6 bg-[#111113]">
-                `
-                history.forEach(msg => {
-                    if (msg.isUser) {
-                        html += `
-                        <div class="flex justify-end">
-                            <div class="max-w-[75%]">
-                                <div class="chat-bubble-user rounded-3xl rounded-tr-none px-5 py-3 text-black">${msg.text}</div>
-                                <div class="text-xs text-gray-400 text-right mt-1">${msg.time}</div>
-                            </div>
-                        </div>`
-                    } else {
-                        // AI 回复
-                        html += `
-                        <div class="flex justify-start">
-                            <div class="max-w-[75%]">
-                                <div class="flex items-center gap-x-2 mb-1">
-                                    <span class="text-xl">${char.name[0]}</span>
-                                    <span class="text-purple-400 text-xs">AI • Lv.${currentLevel}</span>
-                                </div>
-                                <div class="chat-bubble-ai rounded-3xl rounded-tl-none px-5 py-3">${msg.text}</div>
-                                ${msg.action ? `<div class="action-text mt-2 text-sm">${msg.action}</div>` : ''}
-                                <div class="text-xs text-gray-400 mt-1">${msg.time}</div>
-                            </div>
-                        </div>`
-                    }
-                })
-                
-                html += `</div>`
-                
-                // 输入栏
-                html += `
-                    <div class="p-4 bg-gray-900 border-t border-gray-700">
-                        <div class="flex gap-2">
-                            <button onclick="generateImage()" class="w-12 h-12 bg-gray-800 hover:bg-gray-700 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0">
-                                <i class="fas fa-image"></i>
-                            </button>
-                            <input id="chat-input" type="text" placeholder="和 ${char.name} 说点什么..." 
-                                   class="flex-1 bg-gray-800 rounded-3xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-purple-400">
-                            <button onclick="sendMessage()" 
-                                    class="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
-                        <div class="text-[10px] text-center text-gray-400 mt-3">可编辑上一条消息 • 图片由 X.AI 生成</div>
-                    </div>
-                </div>`
-                
-                main.innerHTML = html
-                // 自动滚动到底部
-                setTimeout(() => {
-                    const chatBox = document.getElementById('chat-messages')
-                    if (chatBox) chatBox.scrollTop = chatBox.scrollHeight
-                }, 100)
-            }
-            
-            else if (currentTab === 3) {
-                // ==================== 画廊页 ====================
-                main.innerHTML = `
-                <div class="page px-4 pt-4">
-                    <h2 class="text-2xl font-bold mb-6">全部生成图片</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        ${generatedImages.map(img => `
-                            <div class="rounded-3xl overflow-hidden bg-gray-900">
-                                <img src="${img.url}" class="w-full aspect-square object-cover" alt="">
-                                <div class="p-3 text-sm">${img.desc}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>`
-            }
-            
-            else if (currentTab === 4) {
-                // ==================== 我的页 ====================
-                main.innerHTML = `
-                <div class="page px-4 pt-6">
-                    <div class="bg-gray-900 rounded-3xl p-6 mb-8">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <img src="https://picsum.photos/id/64/128/128" class="w-16 h-16 rounded-2xl mr-4">
-                                <div>
-                                    <div class="font-semibold text-2xl">Telegram</div>
-                                    <div class="text-purple-400">@Caodunduna</div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="text-xs text-gray-400 text-right">剩余钻石</div>
-                                <div class="text-5xl font-bold text-yellow-400">${diamonds}</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div onclick="showRechargeModal()" class="flex justify-between items-center bg-gray-900 rounded-3xl px-6 py-5 mb-4 cursor-pointer">
-                        <div class="flex items-center gap-x-4">
-                            <i class="fas fa-gem text-3xl text-yellow-400"></i>
-                            <div>
-                                <div class="font-medium">卡密充值</div>
-                                <div class="text-sm text-gray-400">1 RMB = 1000 钻石</div>
-                            </div>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400"></i>
-                    </div>
-                    
-                    <div class="text-xs uppercase tracking-widest text-gray-400 mb-3 px-2">其他功能</div>
-                    <div onclick="alert('DM 管理功能仅支持 Telegram 命令执行')" class="flex justify-between items-center bg-gray-900 rounded-3xl px-6 py-5 mb-4 cursor-pointer">
-                        <div class="flex items-center gap-x-4">
-                            <i class="fas fa-paper-plane text-3xl text-violet-400"></i>
-                            <div class="font-medium">DM 管理（隐藏）</div>
-                        </div>
-                        <span class="text-xs bg-violet-400 text-black px-3 py-1 rounded-2xl">仅命令</span>
-                    </div>
-                    
-                    <div class="px-2 text-xs text-gray-400">人物卡 · 好感度 · 身体开发度 均已保存在本地（后续接 Supabase）</div>
-                </div>`
-            }
-        }
-        
-        // ==================== 人物卡相关 ====================
-        function showCardTab(n) {
-            document.querySelectorAll('#card-tab-0, #card-tab-1, #card-tab-2').forEach(el => el.classList.remove('border-b-2', 'border-purple-400'))
-            document.getElementById('card-tab-' + n).classList.add('border-b-2', 'border-purple-400')
-            renderCharactersGrid(n)
-        }
-        
-        function renderCharactersGrid(mode) {
-            const container = document.getElementById('characters-grid')
-            if (!container) return
-            
-            let list = []
-            if (mode === 0) list = allCharacters.filter(c => c.owner === '你')
-            else if (mode === 1) list = collectedCharacters
-            else list = allCharacters
-            
-            container.innerHTML = list.length ? list.map(c => `
-                <div onclick="viewCharacterDetail(${c.id})" class="bg-gray-900 rounded-3xl overflow-hidden cursor-pointer">
-                    <div class="h-40 flex items-end p-4 relative bg-gradient-to-br from-purple-400/20 to-pink-400/20">
-                        ${c.nsfw ? `<div class="absolute top-4 right-4 text-xs bg-pink-500 px-3 rounded-3xl">NSFW</div>` : ''}
+    }
+
+    function saveGeneratedImage() {
+        hideImageModal();
+        switchTab(3);
+    }
+
+    // ==================== Tab 切换 & 渲染 ====================
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('nav-active'));
+        document.getElementById('nav-' + tab).classList.add('nav-active');
+        renderCurrentPage();
+    }
+
+    async function renderCurrentPage() {
+        const main = document.getElementById('main-content');
+        main.innerHTML = '';
+
+        if (currentTab === 0) {
+            // 首页
+            main.innerHTML = `
+            <div class="page px-4 pt-4">
+                <div class="text-3xl font-bold mb-1">早上好！👋</div>
+                <div class="text-gray-400 mb-6">今天想和谁聊天呢？</div>
+                <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-6 mb-8">
+                    <div class="flex justify-between items-start">
                         <div>
-                            <div class="text-2xl font-semibold">${c.name}</div>
-                            <div class="text-xs uppercase">${c.type}系统</div>
+                            <p class="uppercase text-xs tracking-widest text-purple-300">AI 智能等级</p>
+                            <div class="flex gap-x-3 mt-4">
+                                ${[1,2,3,4,5].map(l => `<div onclick="setLevel(${l})" class="cursor-pointer text-center ${currentLevel === l ? 'scale-110' : ''}"><div class="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center text-3xl border-2 ${currentLevel === l ? 'border-purple-400 bg-purple-500/20' : 'border-gray-700'}">${l}</div><p class="text-xs mt-1 ${currentLevel === l ? 'text-purple-400' : 'text-gray-400'}">${l === 5 ? '最聪明' : l === 1 ? '基础' : '智能'}</p></div>`).join('')}
+                            </div>
                         </div>
-                    </div>
-                    <div class="px-4 pt-4 pb-5">
-                        <div class="flex gap-1 flex-wrap">${c.tags.map(t => `<span class="text-[10px] bg-gray-800 px-3 py-px rounded-3xl">${t}</span>`).join('')}</div>
-                        <p class="text-xs text-gray-400 line-clamp-2 mt-3">${c.description}</p>
-                        ${c.type === '养成' ? `<div class="mt-4 text-xs flex items-center"><span class="text-emerald-400">❤️ 好感度 ${c.favor}%</span></div>` : ''}
-                        ${c.nsfw ? `<div class="mt-2 text-xs flex items-center"><span class="text-pink-400">📈 身体开发度 ${c.bodyDev}%</span></div>` : ''}
+                        <div class="text-right">
+                            <div class="text-sm text-gray-400">当前消耗</div>
+                            <div class="text-4xl font-bold text-yellow-400">${currentLevel * 80} 钻石/条</div>
+                        </div>
                     </div>
                 </div>
-            `).join('') : `<div class="col-span-2 py-12 text-center text-gray-400">暂无数据</div>`
+                <h3 class="font-semibold text-lg mb-4 flex items-center gap-x-2"><span>推荐人物卡</span><i class="fas fa-fire text-orange-400"></i></h3>
+                <div class="grid grid-cols-2 gap-4" id="recommend-grid"></div>
+            </div>`;
+            const grid = document.getElementById('recommend-grid');
+            grid.innerHTML = allCharacters.slice(0,4).map(c => `
+                <div onclick="enterChat(${c.id})" class="bg-gray-900 rounded-3xl overflow-hidden cursor-pointer hover:scale-105 transition">
+                    <div class="h-40 bg-gradient-to-br from-purple-400/30 to-pink-400/30 flex items-end p-4 relative">
+                        ${c.nsfw ? `<div class="absolute top-3 right-3 bg-pink-500 text-white text-[10px] px-2 rounded-full">NSFW</div>` : ''}
+                        <div class="text-lg font-semibold">${c.name}</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex flex-wrap gap-1">${c.tags.map(t => `<span class="text-xs bg-gray-800 px-3 py-1 rounded-3xl">${t}</span>`).join('')}</div>
+                        <p class="text-xs text-gray-400 mt-2 line-clamp-2">${c.description}</p>
+                    </div>
+                </div>
+            `).join('');
         }
-        
-        function filterByTag(el) {
-            // 简单演示：点击任意标签都刷新全部
-            document.querySelectorAll('.tag-chip').forEach(t => t.classList.remove('bg-purple-500', 'text-white'))
-            el.classList.add('bg-purple-500', 'text-white')
-            renderCharactersGrid(2)   // 探索页
+
+        else if (currentTab === 1) {
+            // 人物卡页
+            main.innerHTML = `
+            <div class="page px-4 pt-4">
+                <div class="flex justify-between mb-6">
+                    <div class="flex border-b border-gray-700 text-sm">
+                        <div onclick="showCardTab(0)" id="card-tab-0" class="px-6 py-2 border-b-2 border-purple-400 font-medium">我的创建</div>
+                        <div onclick="showCardTab(1)" id="card-tab-1" class="px-6 py-2">我的收藏</div>
+                        <div onclick="showCardTab(2)" id="card-tab-2" class="px-6 py-2">全部探索</div>
+                    </div>
+                    <button onclick="showCreateModal()" class="flex items-center justify-center w-10 h-10 bg-purple-500 rounded-2xl text-xl shadow-lg"><i class="fas fa-plus"></i></button>
+                </div>
+                <div class="flex gap-2 overflow-x-auto pb-3 mb-6 whitespace-nowrap">
+                    <span onclick="filterByTag(this)" class="tag-chip inline-block bg-gray-800 hover:bg-purple-500 px-5 py-1 rounded-3xl text-sm cursor-pointer">全部</span>
+                    <span onclick="filterByTag(this)" class="tag-chip inline-block bg-gray-800 hover:bg-purple-500 px-5 py-1 rounded-3xl text-sm cursor-pointer">校园</span>
+                    <span onclick="filterByTag(this)" class="tag-chip inline-block bg-gray-800 hover:bg-purple-500 px-5 py-1 rounded-3xl text-sm cursor-pointer">幻想</span>
+                    <span onclick="filterByTag(this)" class="tag-chip inline-block bg-gray-800 hover:bg-purple-500 px-5 py-1 rounded-3xl text-sm cursor-pointer">甜宠</span>
+                    <span onclick="filterByTag(this)" class="tag-chip inline-block bg-gray-800 hover:bg-purple-500 px-5 py-1 rounded-3xl text-sm cursor-pointer">NSFW</span>
+                </div>
+                <div id="characters-grid" class="grid grid-cols-2 gap-4"></div>
+            </div>`;
+            renderCharactersGrid(0);
         }
-        
-        function showCreateModal() {
-            document.getElementById('create-modal').classList.remove('hidden')
-            document.getElementById('create-modal').classList.add('flex')
-            // 默认清空
-            document.getElementById('create-form').reset()
-            document.getElementById('fetish-group').classList.add('hidden')
-            selectedType = '养成'
-        }
-        
-        function hideCreateModal() {
-            const modal = document.getElementById('create-modal')
-            modal.classList.add('hidden')
-            modal.classList.remove('flex')
-        }
-        
-        function selectType(btn) {
-            document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('border-purple-500'))
-            btn.classList.add('border-purple-500')
-            selectedType = btn.getAttribute('data-type')
-        }
-        
-        function toggleNSFW() {
-            const checked = document.getElementById('nsfw-toggle').checked
-            const group = document.getElementById('fetish-group')
-            if (checked) group.classList.remove('hidden')
-            else group.classList.add('hidden')
-        }
-        
-        function createCharacter(e) {
-            e.preventDefault()
-            
-            const name = document.getElementById('char-name').value
-            const desc = document.getElementById('char-desc').value
-            const tagsStr = document.getElementById('char-tags').value
-            const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()) : []
-            const nsfw = document.getElementById('nsfw-toggle').checked
-            const fetish = nsfw ? document.getElementById('char-fetish').value : ''
-            
-            const newChar = {
-                id: Date.now(),
-                name: name,
-                type: selectedType,
-                nsfw: nsfw,
-                tags: tags,
-                description: desc,
-                favor: selectedType === '养成' ? 10 : 0,
-                bodyDev: nsfw ? 10 : 0,
-                fetish: fetish,
-                isPublic: document.getElementById('public-toggle').checked,
-                owner: '你'
+
+        else if (currentTab === 2) {
+            if (!currentChatCharacterId) {
+                main.innerHTML = `<div class="page px-4 pt-8 text-center"><i class="fas fa-comments text-8xl text-gray-700 mb-6"></i><p class="text-xl font-medium mb-2">还没有进入聊天</p><p class="text-gray-400">先去「人物卡」选择一个角色吧～</p><button onclick="switchTab(1)" class="mt-10 px-8 py-3 bg-purple-500 rounded-3xl">去选角色</button></div>`;
+                return;
             }
-            
-            allCharacters.unshift(newChar)
-            myCreatedCharacters.unshift(newChar)
-            hideCreateModal()
-            
-            // 提示并切换到人物卡页
-            alert('✅ 人物卡创建成功！')
-            switchTab(1)
-            showCardTab(0)
-        }
-        
-        function viewCharacterDetail(id) {
-            const char = allCharacters.find(c => c.id === id)
-            if (!char) return
-            if (confirm(`是否立即与「${char.name}」开始聊天？`)) {
-                enterChat(id)
-            }
-        }
-        
-        // ==================== 聊天相关 ====================
-        function enterChat(id) {
-            currentChatCharacterId = id
-            switchTab(2)
-        }
-        
-        function exitChat() {
-            currentChatCharacterId = null
-            switchTab(1)
-        }
-        
-        function sendMessage() {
-            const input = document.getElementById('chat-input')
-            if (!input || !currentChatCharacterId) return
-            
-            const text = input.value.trim()
-            if (!text) return
-            
-            // 扣除钻石
-            const cost = currentLevel * 80
-            if (!deductDiamonds(cost)) return
-            
-            const history = chatHistories[currentChatCharacterId]
-            
-            // 用户消息
-            const now = new Date()
-            const time = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`
-            history.push({ isUser: true, text: text, time: time })
-            
-            input.value = ''
-            
-            // 渲染
-            renderCurrentPage()
-            
-            // 模拟 AI 回复（延迟 800ms）
-            setTimeout(() => {
-                const char = allCharacters.find(c => c.id === currentChatCharacterId)
-                let replyText = ''
-                
-                if (currentLevel >= 4) {
-                    replyText = `哇～你说的好有道理！${text} 让我想起了小时候的回忆… 我们接下来要不要一起去散步？😊`
-                } else if (currentLevel >= 2) {
-                    replyText = `嗯嗯～我明白你的意思啦！${text}`
+            const char = allCharacters.find(c => c.id === currentChatCharacterId);
+            const history = chatHistories[currentChatCharacterId] || [];
+            let html = `<div class="page flex flex-col h-[calc(100vh-64px)]"><div class="bg-gray-900 px-4 py-3 flex items-center border-b border-gray-700"><button onclick="exitChat()" class="mr-3 text-2xl"><i class="fas fa-chevron-left"></i></button><div class="flex-1 flex items-center gap-x-3"><div class="text-xl">${char.name}</div>${char.nsfw ? `<span class="text-pink-400 text-xs px-2 py-px bg-pink-500/20 rounded">NSFW</span>` : ''}<span class="text-xs text-gray-400">Lv.${currentLevel}</span></div><div onclick="showCharacterInfo(${currentChatCharacterId})" class="text-purple-400 text-sm flex items-center gap-x-1 cursor-pointer"><i class="fas fa-info-circle"></i> 资料</div></div><div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-6 bg-[#111113]">`;
+            history.forEach(msg => {
+                if (msg.isUser) {
+                    html += `<div class="flex justify-end"><div class="max-w-[75%]"><div class="chat-bubble-user rounded-3xl rounded-tr-none px-5 py-3 text-black">${msg.text}</div><div class="text-xs text-gray-400 text-right mt-1">${msg.time}</div></div></div>`;
                 } else {
-                    replyText = '是的！'
+                    html += `<div class="flex justify-start"><div class="max-w-[75%]"><div class="flex items-center gap-x-2 mb-1"><span class="text-xl">${char.name[0]}</span><span class="text-purple-400 text-xs">AI • Lv.${currentLevel}</span></div><div class="chat-bubble-ai rounded-3xl rounded-tl-none px-5 py-3">${msg.text}</div>${msg.action ? `<div class="action-text mt-2 text-sm">${msg.action}</div>` : ''}<div class="text-xs text-gray-400 mt-1">${msg.time}</div></div></div>`;
                 }
-                
-                // 随机添加动作
-                const actions = ['*轻轻抱住你*', '*脸红低头*', '*偷偷亲了你一下*', '']
-                const action = actions[Math.floor(Math.random() * actions.length)]
-                
-                history.push({
-                    isUser: false,
-                    text: replyText,
-                    action: action,
-                    time: `${now.getHours()}:${(now.getMinutes() + 1).toString().padStart(2, '0')}`
-                })
-                
-                // 如果是养成系统，增加好感度
-                const charObj = allCharacters.find(c => c.id === currentChatCharacterId)
-                if (charObj && charObj.type === '养成') {
-                    charObj.favor = Math.min(100, charObj.favor + 5)
-                }
-                // 如果 NSFW，增加开发度
-                if (charObj && charObj.nsfw) {
-                    charObj.bodyDev = Math.min(100, charObj.bodyDev + (Math.random() * 8))
-                }
-                
-                renderCurrentPage()
-            }, 800)
+            });
+            html += `</div><div class="p-4 bg-gray-900 border-t border-gray-700"><div class="flex gap-2"><button onclick="generateImage()" class="w-12 h-12 bg-gray-800 hover:bg-gray-700 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"><i class="fas fa-image"></i></button><input id="chat-input" type="text" placeholder="和 ${char.name} 说点什么..." class="flex-1 bg-gray-800 rounded-3xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-purple-400"><button onclick="sendMessage()" class="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"><i class="fas fa-paper-plane"></i></button></div><div class="text-[10px] text-center text-gray-400 mt-3">可编辑上一条消息 • 图片由 X.AI 生成</div></div></div>`;
+            main.innerHTML = html;
+            setTimeout(() => { const box = document.getElementById('chat-messages'); if (box) box.scrollTop = box.scrollHeight; }, 100);
         }
-        
-        function generateImage() {
-            if (!currentChatCharacterId) return
-            const modal = document.getElementById('image-modal')
-            modal.classList.remove('hidden')
-            modal.classList.add('flex')
-            
-            const char = allCharacters.find(c => c.id === currentChatCharacterId)
-            const preview = document.getElementById('generated-image-preview')
-            preview.innerHTML = `
-                <div class="text-center">
-                    <div class="animate-spin w-12 h-12 border-4 border-purple-400 border-t-transparent rounded-full mx-auto mb-4"></div>
-                    <p class="text-purple-300">X.AI 正在生成基于「${char.name}」的图片…</p>
-                </div>`
-            
-            // 模拟生成
-            setTimeout(() => {
-                const fakeUrl = `https://picsum.photos/id/${100 + currentChatCharacterId}/600/800`
-                preview.innerHTML = `<img src="${fakeUrl}" class="w-full h-full object-cover rounded-3xl">`
-                document.getElementById('image-desc').innerHTML = `人物卡：${char.name} • 对话场景生成`
-            }, 1200)
+
+        else if (currentTab === 3) {
+            main.innerHTML = `
+            <div class="page px-4 pt-4">
+                <h2 class="text-2xl font-bold mb-6">全部生成图片</h2>
+                <div class="grid grid-cols-2 gap-4" id="gallery-grid"></div>
+            </div>`;
+            const g = document.getElementById('gallery-grid');
+            g.innerHTML = generatedImages.map(img => `<div class="rounded-3xl overflow-hidden bg-gray-900"><img src="${img.url}" class="w-full aspect-square object-cover"><div class="p-3 text-sm">${img.desc}</div></div>`).join('');
         }
-        
-        function hideImageModal() {
-            const modal = document.getElementById('image-modal')
-            modal.classList.add('hidden')
-            modal.classList.remove('flex')
+
+        else if (currentTab === 4) {
+            main.innerHTML = `
+            <div class="page px-4 pt-6">
+                <div class="bg-gray-900 rounded-3xl p-6 mb-8">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <img src="https://picsum.photos/id/64/128/128" class="w-16 h-16 rounded-2xl mr-4">
+                            <div>
+                                <div class="font-semibold text-2xl">茂方</div>
+                                <div class="text-purple-400">@Caodunduna</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-400 text-right">剩余钻石</div>
+                            <div class="text-5xl font-bold text-yellow-400">${diamonds}</div>
+                        </div>
+                    </div>
+                </div>
+                <div onclick="showRechargeModal()" class="flex justify-between items-center bg-gray-900 rounded-3xl px-6 py-5 mb-4 cursor-pointer">
+                    <div class="flex items-center gap-x-4">
+                        <i class="fas fa-gem text-3xl text-yellow-400"></i>
+                        <div>
+                            <div class="font-medium">卡密充值</div>
+                            <div class="text-sm text-gray-400">1 RMB = 1000 钻石</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
+                </div>
+                <div class="text-xs uppercase tracking-widest text-gray-400 mb-3 px-2">其他功能</div>
+                <div onclick="alert('DM 管理功能仅支持 Telegram 命令执行')" class="flex justify-between items-center bg-gray-900 rounded-3xl px-6 py-5 mb-4 cursor-pointer">
+                    <div class="flex items-center gap-x-4">
+                        <i class="fas fa-paper-plane text-3xl text-violet-400"></i>
+                        <div class="font-medium">DM 管理（隐藏）</div>
+                    </div>
+                    <span class="text-xs bg-violet-400 text-black px-3 py-1 rounded-2xl">仅命令</span>
+                </div>
+            </div>`;
         }
-        
-        function saveGeneratedImage() {
-            const char = allCharacters.find(c => c.id === currentChatCharacterId)
-            const newImg = {
-                id: Date.now(),
-                url: `https://picsum.photos/id/${100 + currentChatCharacterId}/600/800`,
-                desc: `${char.name} - 最新生成`,
-                charId: currentChatCharacterId
-            }
-            generatedImages.unshift(newImg)
-            hideImageModal()
-            alert('✅ 图片已保存到画廊！')
-            switchTab(3)   // 切换到画廊
-        }
-        
-        function showCharacterInfo(id) {
-            const char = allCharacters.find(c => c.id === id)
-            if (!char) return
-            let info = `${char.name}\n类型：${char.type}系统\n${char.nsfw ? 'NSFW 已开启\n性癖：' + (char.fetish || '无') : ''}\n`
-            if (char.type === '养成') info += `❤️ 好感度：${char.favor}%\n`
-            if (char.nsfw) info += `📈 身体开发度：${Math.floor(char.bodyDev)}%`
-            alert(info)
-        }
-        
-        // ==================== 充值相关 ====================
-        function showRechargeModal() {
-            document.getElementById('recharge-modal').classList.remove('hidden')
-            document.getElementById('recharge-modal').classList.add('flex')
-        }
-        
-        function hideRechargeModal() {
-            const modal = document.getElementById('recharge-modal')
-            modal.classList.add('hidden')
-            modal.classList.remove('flex')
-        }
-        
-        function redeemCardKey() {
-            const key = document.getElementById('card-key').value.trim()
-            if (!key) {
-                alert('请输入卡密')
-                return
-            }
-            // Mock 充值
-            diamonds += 5000
-            updateBalance()
-            hideRechargeModal()
-            alert('✅ 充值成功！+5000 钻石')
-            document.getElementById('card-key').value = ''
-        }
-        
-        // ==================== 设置 AI 等级 ====================
-        function setLevel(lvl) {
-            currentLevel = lvl
-            document.getElementById('current-level-badge').innerHTML = `Lv.${lvl}`
-            alert(`AI 智能等级已切换为 ${lvl} 级\n更高等级回复更长、更智能，但消耗更多钻石`)
-            if (currentTab === 0) renderCurrentPage()
-        }
-        
-        // ==================== 初始化 ====================
-        function init() {
-            initTailwind()
-            updateBalance()
-            // 默认进入首页
-            renderCurrentPage()
-            
-            console.log('%c✅ 前端页面已就绪（单文件原型）\n适配手机 & Telegram 小程序\n后续可直接部署 Vercel', 'color:#a855f7;font-weight:bold')
-        }
-        
-        // 启动
-        window.onload = init
-    </script>
+    }
+
+    function showCardTab(n) {
+        document.querySelectorAll('#card-tab-0, #card-tab-1, #card-tab-2').forEach(el => el.classList.remove('border-b-2', 'border-purple-400'));
+        document.getElementById('card-tab-' + n).classList.add('border-b-2', 'border-purple-400');
+        renderCharactersGrid(n);
+    }
+
+    function renderCharactersGrid(mode) {
+        const container = document.getElementById('characters-grid');
+        if (!container) return;
+        let list = [];
+        if (mode === 0) list = myCreatedCharacters;
+        else if (mode === 1) list = collectedCharacters;
+        else list = allCharacters;
+        container.innerHTML = list.length ? list.map(c => `
+            <div onclick="viewCharacterDetail(${c.id})" class="bg-gray-900 rounded-3xl overflow-hidden cursor-pointer">
+                <div class="h-40 flex items-end p-4 relative bg-gradient-to-br from-purple-400/20 to-pink-400/20">
+                    ${c.nsfw ? `<div class="absolute top-4 right-4 text-xs bg-pink-500 px-3 rounded-3xl">NSFW</div>` : ''}
+                    <div><div class="text-2xl font-semibold">${c.name}</div><div class="text-xs uppercase">${c.type}系统</div></div>
+                </div>
+                <div class="px-4 pt-4 pb-5">
+                    <div class="flex gap-1 flex-wrap">${c.tags.map(t => `<span class="text-[10px] bg-gray-800 px-3 py-px rounded-3xl">${t}</span>`).join('')}</div>
+                    <p class="text-xs text-gray-400 line-clamp-2 mt-3">${c.description}</p>
+                    ${c.type === '养成' ? `<div class="mt-4 text-xs flex items-center"><span class="text-emerald-400">❤️ 好感度 ${c.favor || 10}%</span></div>` : ''}
+                    ${c.nsfw ? `<div class="mt-2 text-xs flex items-center"><span class="text-pink-400">📈 身体开发度 ${c.body_dev || 0}%</span></div>` : ''}
+                </div>
+            </div>
+        `).join('') : `<div class="col-span-2 py-12 text-center text-gray-400">暂无数据</div>`;
+    }
+
+    function filterByTag(el) {
+        document.querySelectorAll('.tag-chip').forEach(t => t.classList.remove('bg-purple-500', 'text-white'));
+        el.classList.add('bg-purple-500', 'text-white');
+        renderCharactersGrid(2);
+    }
+
+    function showCreateModal() {
+        document.getElementById('create-modal').classList.remove('hidden');
+        document.getElementById('create-modal').classList.add('flex');
+        document.getElementById('create-form').reset();
+        document.getElementById('fetish-group').classList.add('hidden');
+    }
+
+    function hideCreateModal() {
+        const modal = document.getElementById('create-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    function selectType(btn) {
+        document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('border-purple-500'));
+        btn.classList.add('border-purple-500');
+        selectedType = btn.getAttribute('data-type');
+    }
+
+    function toggleNSFW() {
+        const checked = document.getElementById('nsfw-toggle').checked;
+        document.getElementById('fetish-group').classList.toggle('hidden', !checked);
+    }
+
+    function viewCharacterDetail(id) {
+        const char = allCharacters.find(c => c.id === id);
+        if (!char) return;
+        if (confirm(`是否立即与「${char.name}」开始聊天？`)) enterChat(id);
+    }
+
+    function enterChat(id) {
+        currentChatCharacterId = id;
+        if (!chatHistories[id]) chatHistories[id] = [];
+        switchTab(2);
+    }
+
+    function exitChat() {
+        currentChatCharacterId = null;
+        switchTab(1);
+    }
+
+    function showCharacterInfo(id) {
+        const char = allCharacters.find(c => c.id === id);
+        if (!char) return;
+        let info = `${char.name}\n类型：${char.type}系统\n${char.nsfw ? 'NSFW 已开启\n性癖：' + (char.fetish || '无') : ''}\n`;
+        if (char.type === '养成') info += `❤️ 好感度：${char.favor || 10}%\n`;
+        if (char.nsfw) info += `📈 身体开发度：${char.body_dev || 0}%`;
+        alert(info);
+    }
+
+    function setLevel(lvl) {
+        currentLevel = lvl;
+        document.getElementById('current-level-badge').innerHTML = `Lv.${lvl}`;
+        alert(`AI 智能等级已切换为 ${lvl} 级`);
+        if (currentTab === 0) renderCurrentPage();
+    }
+
+    function redeemCardKey() {
+        const key = document.getElementById('card-key').value.trim();
+        if (!key) return alert('请输入卡密');
+        alert('✅ 充值成功！');
+        diamonds += 5000;
+        updateBalance();
+        hideRechargeModal();
+    }
+
+    // ==================== 初始化 ====================
+    async function init() {
+        await loadBalance();
+        await loadCharacters();
+        await loadMyCharacters();
+        await loadGallery();
+        renderCurrentPage();
+    }
+    window.onload = init;
+</script>
 </body>
 </html>
