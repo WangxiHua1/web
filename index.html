@@ -275,42 +275,58 @@
         main.innerHTML = '';
 
         if (currentTab === 0) {
-            // 首页
-            main.innerHTML = `
-            <div class="page px-4 pt-4">
-                <div class="text-3xl font-bold mb-1">早上好！👋</div>
-                <div class="text-gray-400 mb-6">今天想和谁聊天呢？</div>
-                <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-6 mb-8">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="uppercase text-xs tracking-widest text-purple-300">AI 智能等级</p>
-                            <div class="flex gap-x-3 mt-4">
-                                ${[1,2,3,4,5].map(l => `<div onclick="setLevel(${l})" class="cursor-pointer text-center ${currentLevel === l ? 'scale-110' : ''}"><div class="w-12 h-12 mx-auto rounded-2xl flex items-center justify-center text-3xl border-2 ${currentLevel === l ? 'border-purple-400 bg-purple-500/20' : 'border-gray-700'}">${l}</div><p class="text-xs mt-1 ${currentLevel === l ? 'text-purple-400' : 'text-gray-400'}">${l === 5 ? '最聪明' : l === 1 ? '基础' : '智能'}</p></div>`).join('')}
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm text-gray-400">当前消耗</div>
-                            <div class="text-3xl font-bold text-yellow-400">${currentLevel * 80} 钻石/条</div>
-                        </div>
+            if (currentTab === 0) {
+    main.innerHTML = `
+    <div class="page px-4 pt-4 pb-6">
+        <div class="text-3xl font-bold mb-1 flex items-center gap-2">你好！ <span class="text-3xl">👋</span></div>
+        <div class="text-gray-400 mb-6 text-base">今天想和谁聊天呢？</div>
+        
+        <!-- AI 智能等级卡片（已优化手机尺寸） -->
+        <div class="bg-[#1a1a2e] rounded-3xl p-5 mb-8">
+            <div class="flex justify-between items-start mb-4">
+                <p class="text-purple-300 text-sm font-medium">AI 智能等级</p>
+                <p class="text-gray-400 text-sm">当前消耗</p>
+            </div>
+            
+            <div class="flex gap-x-2 mb-5">
+                ${[1,2,3,4,5].map(l => `
+                    <div onclick="setLevel(${l})" class="flex-1 cursor-pointer text-center">
+                        <div class="h-11 flex items-center justify-center text-xl font-bold rounded-2xl ${currentLevel === l ? 'bg-purple-500 text-white ring-2 ring-purple-400' : 'bg-white/10 text-white'}">${l}</div>
+                        <p class="text-[10px] mt-1 ${currentLevel === l ? 'text-purple-400' : 'text-gray-400'}">${l === 1 ? '基础' : l === 5 ? '最聪明' : '智能'}</p>
                     </div>
-                </div>
-                <h3 class="font-semibold text-lg mb-4 flex items-center gap-x-2"><span>推荐人物卡</span><i class="fas fa-fire text-orange-400"></i></h3>
-                <div class="grid grid-cols-2 gap-4" id="recommend-grid"></div>
-            </div>`;
-            const grid = document.getElementById('recommend-grid');
-            grid.innerHTML = allCharacters.slice(0,4).map(c => `
-                <div onclick="enterChat(${c.id})" class="bg-gray-900 rounded-3xl overflow-hidden cursor-pointer hover:scale-105 transition">
-                    <div class="h-40 bg-gradient-to-br from-purple-400/30 to-pink-400/30 flex items-end p-4 relative">
-                        ${c.nsfw ? `<div class="absolute top-3 right-3 bg-pink-500 text-white text-[10px] px-2 rounded-full">NSFW</div>` : ''}
-                        <div class="text-lg font-semibold">${c.name}</div>
-                    </div>
-                    <div class="p-4">
-                        <div class="flex flex-wrap gap-1">${c.tags.map(t => `<span class="text-xs bg-gray-800 px-3 py-1 rounded-3xl">${t}</span>`).join('')}</div>
-                        <p class="text-xs text-gray-400 mt-2 line-clamp-2">${c.description}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
+                `).join('')}
+            </div>
+            
+            <!-- 240钻石/条（已调小字体，手机更协调） -->
+            <div class="text-right">
+                <span class="text-3xl font-bold text-yellow-400">${currentLevel * 80}</span>
+                <span class="text-yellow-400 text-base ml-1">钻石/条</span>
+            </div>
+        </div>
+        
+        <!-- 推荐人物卡 -->
+        <h3 class="font-semibold text-lg mb-4 flex items-center gap-x-2">
+            <span>推荐人物卡</span>
+            <span class="text-orange-400 text-xl">🔥</span>
+        </h3>
+        <div class="grid grid-cols-2 gap-4" id="recommend-grid"></div>
+    </div>`;
+    
+    // 推荐人物卡渲染
+    const grid = document.getElementById('recommend-grid');
+    grid.innerHTML = allCharacters.slice(0,4).map(c => `
+        <div onclick="enterChat(${c.id})" class="bg-[#1a1a2e] rounded-3xl overflow-hidden cursor-pointer active:scale-95 transition">
+            <div class="h-36 bg-gradient-to-br from-purple-400/30 to-pink-400/30 flex items-end p-4 relative">
+                ${c.nsfw ? `<div class="absolute top-3 right-3 bg-pink-500 text-white text-[10px] px-2 rounded-full">NSFW</div>` : ''}
+                <div class="text-lg font-semibold">${c.name}</div>
+            </div>
+            <div class="p-4">
+                <div class="flex flex-wrap gap-1">${c.tags.map(t => `<span class="text-xs bg-white/10 px-3 py-1 rounded-3xl">${t}</span>`).join('')}</div>
+                <p class="text-xs text-gray-400 mt-3 line-clamp-2">${c.description}</p>
+            </div>
+        </div>
+    `).join('');
+}
 
         else if (currentTab === 1) {
             // 人物卡页
